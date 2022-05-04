@@ -251,7 +251,7 @@ These experiments measure page fault latency on Linux (v5.5.8) for each of the w
 
    ```sh
    mkdir results/
-   rsync {MACHINE}:~/vm_shared/ results/
+   rsync -avzP {MACHINE}:~/vm_shared/ results/
    ```
 
 3. Process the output to generate plots. For each workload, let `$RESULTS_PATH` be the path to the output (in the `results/` directory we just created). Then, the following command generates the subplots of Figure 2:
@@ -265,58 +265,43 @@ These experiments measure page fault latency on Linux (v5.5.8) for each of the w
 
 ### Figure 4
 
-These are similar to Figure 2, but they don't show breakdown by type of page
-fault and they include results for HawkEye and CBMM, in addition to Linux.
+These experiments are similar to Figure 2. They collect the same data as Figure
+2, but on HawkEye and CBMM, too. Additionally, we will process them differently
+to generate different plots.
 
-**CBMM, without fragmentation**
+1. Run the experiments.
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/xz-training.csv hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mcf.csv hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/canneal.csv canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mongodb.csv mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/memcached.csv memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000  --asynczero --mm_econ --mm_econ_benefits redis-server ./profiles/mix-redis.csv mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/thp-ubmk.csv thp_ubmk 150
-```
+   Note that we can reuse the results from the Figure 2 experiments for Linux, so `figure-4.sh` does not run them.
 
-**CBMM, with fragmentation**
+   Note that this script runs all experiments sequentially, which would take multiple days. Feel free to comment out some experiments (lines in the `figure-4.sh` script) to produce partial results.
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/xz-training.csv hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mcf.csv hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/canneal.csv canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mongodb.csv mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/memcached.csv memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 --fragmentation 100 --asynczero --mm_econ --mm_econ_benefits redis-server ./profiles/mix-redis.csv mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/thp-ubmk.csv thp_ubmk 150
-```
+    ```sh
+    cd cbmm-runner/runner
+    ../../scripts/figure-4.sh
+    ```
 
-**HawkEye, without fragmentation**
+2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846  --hawkeye hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846  --hawkeye hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846  --hawkeye canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846  --hawkeye mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846  --hawkeye memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846  --hawkeye --hawkeye_debloat memhog mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846  --hawkeye thp_ubmk 150
-```
+   ```sh
+   mkdir results/
+   rsync -avzP {MACHINE}:~/vm_shared/ results/
+   ```
 
-**HawkEye, with fragmentation**
+3. Process the output to generate plots. For each workload, let
+   - `$LINUX_RESULTS` be the results of the Linux experiment for that workload and fragmentation setting,
+   - `$HAWKEYE_RESULTS` be the results of the Hawkeye experiment ...
+   - `$CBMM_RESULTS` be the results of the CBMM experiment...
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846 --fragmentation 100 --hawkeye hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846 --fragmentation 100 --hawkeye hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846 --fragmentation 100 --hawkeye canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846 --fragmentation 100 --hawkeye mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846 --fragmentation 100 --hawkeye memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846 --fragmentation 100 --hawkeye --hawkeye_debloat memhog mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --bpf_pftrace --bpf_pftrace_threshold 3846 --fragmentation 100 --hawkeye thp_ubmk 150
-```
+   Then, we can produce the subplot of Figure 4 representing a particular workload and fragmentation setting as follows:
 
-TODO: plotting
+   # TODO obviate manual editing
+   # TODO scale and page fault rate...
+   ```sh
+   /nobackup/linux-mm-econ/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $LINUX_RESULTS.{pftrace,rejected} 10000 > /tmp/tails.txt
+   /nobackup/linux-mm-econ/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $CBMM_RESULTS.{pftrace,rejected} 10000 >> /tmp/tails.txt
+   FREQ=2600 /nobackup/scripts/bpf-pftrace-percentiles.py $HAWKEYE_RESULTS.pftrace 3846 10 >> /tmp/tails.txt
+   OUTFNAME=tails-mix PDF=1 FREQ=2200 SCALE="17.55 52.42 39.88" ./scripts/tail-cdf.py 10 $(cat /tmp/tails.txt)
+   ```
 
 ### Figure 5
 
