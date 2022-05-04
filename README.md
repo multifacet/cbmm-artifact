@@ -114,7 +114,14 @@ NOTE: We include `cbmm-runner` and `cbmm` in this repository for archival reason
    ./target/debug/runner setup00004 {MACHINE} {USER}
    ```
 
-6. **Congratulations!** You should now have a fully-set-up _driver_ and _test_ machine pair. We can now begin running experiments.
+6. Build the `read-pftrace` tool which is used to read the page fault latency traces in Figures 2 and 4. They are in a compressed binary format to save space.
+
+   ```sh
+   cd cbmm-artifacts/cbmm/mm/read-pftrace
+   cargo build --release
+   ```
+
+7. **Congratulations!** You should now have a fully-set-up _driver_ and _test_ machine pair. We can now begin running experiments.
 
 ### Kick the tires (some small tests)
 
@@ -151,6 +158,8 @@ In each case, the _test_ machine will be reboot, will have a bunch of configurat
 
 We provide commands for generating the data in each of the figures in the
 paper and plotting them.
+
+TODO: include table of approximate running times for each workload.
 
 ### Figure 1
 
@@ -227,54 +236,37 @@ We give only examples here, but the full set of commands to run experiments is i
 
 ### Figure 2
 
-The following experiments measure page fault latency on Linux (v5.5.8) for each of the workloads we measured.
+These experiments measure page fault latency on Linux (v5.5.8) for each of the workloads we measured.
 
-**Without fragmentation**:
+1. Run the experiments.
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000 thp_ubmk 150
-```
+   Note that this script runs all experiments sequentially, which would take multiple days. Feel free to comment out some experiments (lines in the `figure-2.sh` script) to produce partial results.
 
-**With fragmentation**:
+    ```sh
+    cd cbmm-runner/runner
+    ../../scripts/figure-2.sh
+    ```
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --fragmentation 100 --memstats --pftrace --pftrace_threshold 10000 hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --fragmentation 100 --memstats --pftrace --pftrace_threshold 10000 hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --fragmentation 100 --memstats --pftrace --pftrace_threshold 10000 canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --fragmentation 100 --memstats --pftrace --pftrace_threshold 10000 mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --fragmentation 100 --memstats --pftrace --pftrace_threshold 10000 memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --fragmentation 100 --memstats --pftrace --pftrace_threshold 10000 mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --fragmentation 100 --memstats --pftrace --pftrace_threshold 10000 thp_ubmk 150
-```
+2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
-The output of these experiments is binary formatted (to save space). To read the output, use the `read-pftrace` tool included in CBMM repo:
+   ```sh
+   mkdir results/
+   rsync {MACHINE}:~/vm_shared/ results/
+   ```
 
-```sh
-# Build the tool (only needs to be done the first time)
-cd ./cbmm/mm/read-pftrace/
-cargo build --release
+3. Process the output to generate plots. For each workload, let `$RESULTS_PATH` be the path to the output (in the `results/` directory we just created). Then, the following command generates the subplots of Figure 2:
 
-# Run the tool and plot the results
-cd cbmm-artifact
-./scripts/cdf.py $(./cbmm/mm/read-pftrace/target/release/read-pftrace --cli-only \
-   --exclude NOT_ANON --exclude SWAP --other-category 600 \
-   -- $RESULTS_PATH.{pftrace,rejected} 10000)
-```
-
-where `$RESULTS_PATH` is the path to the output of a particular experiment. This produces each subplot of Figure 2.
+   ```sh
+   cd cbmm-artifact
+   ./scripts/cdf.py $(./cbmm/mm/read-pftrace/target/release/read-pftrace --cli-only \
+      --exclude NOT_ANON --exclude SWAP --other-category 600 \
+      -- $RESULTS_PATH.{pftrace,rejected} 10000)
+   ```
 
 ### Figure 4
 
 These are similar to Figure 2, but they don't show breakdown by type of page
 fault and they include results for HawkEye and CBMM, in addition to Linux.
-
-TODO: add warning about long-running experiments...
 
 **CBMM, without fragmentation**
 
