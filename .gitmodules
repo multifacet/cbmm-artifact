@@ -1,0 +1,6 @@
+[submodule "cbmm-runner"]
+	path = cbmm-runner
+	url = https://github.com/multifacet/cbmm-runner
+[submodule "cbmm"]
+	path = cbmm
+	url = https://github.com/multifacet/cbmm
