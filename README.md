@@ -9,6 +9,7 @@ This artifact contains:
 - `cbmm/`: a git submodule containing our primary artifact, the CBMM kernel, which is a modified version of Linux 5.5.8.
 - `cbmm-runner/`: a git submodule of our `runner` tool, which runs our experiments.
 - `profiles/`: a set of profiles we used in our evaluation. More later.
+- `plotting-scripts`: a set of scripts for plotting data to produce the figures in the paper.
 
 Since our artifact is a kernel, our evaluation uses two machines: one to drive experiments (the _driver_ machine) and one for the experiments to run on (the _test_ machine). We do it this way so that our experiments can run on bare metal without virtualization overheads to muddle the results. We use two separate machines because it makes automation and scripting easier.
 
@@ -118,15 +119,45 @@ In each case, the _test_ machine will be reboot, will have a bunch of configurat
 2. Run the `mix` workload with size 10GB and produce profiling information for eager paging.
 
    ```sh
-   ./target/debug/runner exp00012 {MACHINE} {USER} --eagerprofile 60 --instrument redis-server   mixycsb 10 --op_count 900000 --read_prop 0.50 --update_prop 0.25
+   ./target/debug/runner exp00012 {MACHINE} {USER} --eagerprofile 60 \
+      --instrument redis-server mixycsb 10 --op_count 900000 \
+      --read_prop 0.50 --update_prop 0.25
    ```
 
 3. Run the `memcached` workload with size 10GB on CBMM with the given profile and collect page fault latency information.
 
    ```sh
-   ./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace --pftrace_threshold 10000  --asynczero --mm_econ --mm_econ_benefit_file ../../profiles/memcached.csv memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
+   ./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace \
+      --pftrace_threshold 10000  --asynczero --mm_econ \
+      --mm_econ_benefit_file ../../profiles/memcached.csv \
+      memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
    ```
 
 ## Detailed Instructions
+
+We provide commands for generating the data in each of the figures in the
+paper and plotting them.
+
+### Figure 1
+
+TODO
+
+### Figure 2
+
+TODO
+
+### Figure 4
+
+TODO
+
+### Figure 5
+
+TODO
+
+### Figure 6
+
+TODO
+
+### Section 5.5
 
 TODO
