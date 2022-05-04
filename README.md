@@ -140,6 +140,8 @@ paper and plotting them.
 
 ### Figure 1
 
+**NOTE**: This figure contains the results of ~4000 experiments. It took two students 1 month to run all experiments on 50 machines. We include the commands for completeness, but we also include the final results (the profiles) in `profiles/`, for your use in the remaining experiments.
+
 TODO
 
 ### Figure 2
