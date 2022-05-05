@@ -27,7 +27,7 @@ TODO: Because that is extremely time consuming, we provide a screencast and inte
 ## Hardware and Software Requirements
 
 _Driver_ machine:
-- A recent Linux distro with standard utilities. We ran extensively on Ubuntu 18.04 and Ubuntu 20.04. In theory, we should support MacOS, but it's never been tested, so YMMV.
+- A recent Linux distro with standard utilities. We ran extensively on Ubuntu 18.04 and Ubuntu 20.04.
 - [Rust](https://rust-lang.org) 1.31 or greater. The `runner` is written in rust.
 - Needs to have _passwordless_ SSH access to the _test_ machine. This is used for automatedly running commands for the experiments.
    - The network needs to be _stable_ for long periods of time, as the SSH connection is maintained while long-running commands run.
@@ -38,7 +38,7 @@ _Driver_ machine:
 _Test_ machine:
 - The hardware specs of our test machine are in Section 5.1 of the paper.
    - NOTE: the machine should have close to 192GB of memory. We chose our workload sizes carefully so as not to over- or under-pressure memory but have representative results.
-   - NOTE: the machine needs a fair bit of free disk space, as building and running the artifact can produce a lot of output.
+   - NOTE: the machine needs >=50GB free disk space, as building and running the artifact can produce a lot of output.
 - Centos 7
    - We will install the CBMM kernel in the instructions below.
 - Needs to have internet access to download software packages through `yum`, `git`, `wget`, `curl`.
@@ -47,11 +47,13 @@ _Test_ machine:
 
 We will clone and build the `runner` program on the _driver_ machine. The `runner` will then be used to set up the _test_ machine as needed. The `runner` can subsequently be used to run any experiments in the paper.
 
+There are two primary configurations: Linux/CBMM and HawkEye. The Linux/CBMM configuration is used for all experiments on plain Linux or CBMM and is based on the 5.5.8 kernel. The HawkEye configuration is used for all HawkEye experiments (used as a comparison system in our paper). We recommend running all Linux/CBMM experiments across figures and then all HawkEye experiments so as to avoid reinstalling kernels multiple times. Alternately, one can set up two _test_ machines (one for Linux/CBMM and one for HawkEye), which could save time.
+
 NOTE: We include `cbmm-runner` and `cbmm` in this repository for archival reasons, but our scripts download them anyway from github.
 
 ### Setup
 
-**On the _driver_ machine**
+**Run all of these steps on the _driver_ machine**, _not_ the _test_ machine.
 
 1. Clone this repo.
 
@@ -82,14 +84,6 @@ NOTE: We include `cbmm-runner` and `cbmm` in this repository for archival reason
       - `/path/to/spec2017.iso` with the path to your ISO,
       - `--swap sdb` with the proper partition name for your swap partition.
 
-   **Troubleshooting**
-      - Copying the SPEC2017 ISO hangs or fails.
-         - Make sure that SSH'ing into the _test_ machine is passwordless and requires no interaction. For example, log into the machine manually once to address any fingerprint confirmations that SSH may generate.
-      - On CloudLab, root partition is only 16GB and runs out of space.
-         - Pass the `--resize_root` flag, which expands the size of the main partition.
-      - On my machine, `/dev/sda` may point to different devices after a reboot.
-         - Pass the `--unstable_device_names` flag, which causes the runner to use device UUIDs instead.
-
    ```sh
    # Clones/installs/builds a bunch of dependencies and benchmarks.
    ./target/debug/runner setup00000 {MACHINE} {USER} --centos7 --jemalloc \
@@ -98,7 +92,17 @@ NOTE: We include `cbmm-runner` and `cbmm` in this repository for archival reason
       --spec_2017 /path/to/spec2017.iso
    ```
 
-5. **Option A** Use the `runner` to install CBMM (our system) on the _test_ machine. This should take about ~1 hour. The command should produce lots of output about the commands being run and their output. The commands being run are on the _test_ machine (over SSH), not the _driver_.
+   **Troubleshooting**
+      - Copying the SPEC2017 ISO hangs or fails.
+         - Make sure that SSH'ing into the _test_ machine is passwordless and requires no interaction. For example, log into the machine manually once to address any fingerprint confirmations that SSH may generate.
+      - On CloudLab, root partition is only 16GB and runs out of space.
+         - Pass the `--resize_root` flag, which expands the size of the main partition.
+      - On my machine, `/dev/sda` may point to different devices after a reboot.
+         - Pass the `--unstable_device_names` flag, which causes the runner to use device UUIDs instead.
+
+5. At this point, we need to choose a kernel to install. For Linux/CBMM experiments, choose **Option A**. To setup a machine for HawkEye experiments, choose **Option B**. In the future, you can switch to the other configuration by just executing the command for the other option (you don't need to rerun the previous steps).
+
+   **Option A** Use the `runner` to install CBMM (our system) on the _test_ machine. This should take about ~1 hour. The command should produce lots of output about the commands being run and their output. The commands being run are on the _test_ machine (over SSH), not the _driver_.
 
    ```sh
    # Clones and builds the CBMM kernel at the given git commit hash.
@@ -133,13 +137,13 @@ The following commands run fast (<15 minutes) test experiments. The commands sho
 
 In each case, the _test_ machine will be reboot, will have a bunch of configuration setting set (e.g., CPU scaling governor, etc), will run the given experiment, and will produce a collection of output files with the same name and different extensions in `~/vm_shared/` on the _test_ machine.
 
-1. Run the `thp_ubmk` microbenchmark with size 10GB, collecting the contents of `/proc/[pid]/smaps` periodically.
+1. Run the `thp_ubmk` microbenchmark with size 10GB, collecting the contents of `/proc/[pid]/smaps` periodically. This should work for either configuration (Linux/CBMM or HawkEye).
 
    ```sh
    ./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   thp_ubmk 10
    ```
 
-2. Run the `mix` workload with size 10GB and produce profiling information for eager paging.
+2. Run the `mix` workload with size 10GB and produce profiling information for eager paging.  This should work for either configuration (Linux/CBMM or HawkEye).
 
    ```sh
    ./target/debug/runner exp00012 {MACHINE} {USER} --eagerprofile 60 \
@@ -147,7 +151,7 @@ In each case, the _test_ machine will be reboot, will have a bunch of configurat
       --read_prop 0.50 --update_prop 0.25
    ```
 
-3. Run the `memcached` workload with size 10GB on CBMM with the given profile and collect page fault latency information.
+3. Run the `memcached` workload with size 10GB on CBMM with the given profile and collect page fault latency information.  This will only work for the Linux/CBMM configuration.
 
    ```sh
    ./target/debug/runner exp00010 {MACHINE} {USER} --memstats --pftrace \
@@ -158,8 +162,7 @@ In each case, the _test_ machine will be reboot, will have a bunch of configurat
 
 ## Detailed Instructions
 
-We provide commands for generating the data in each of the figures in the
-paper and plotting them.
+We provide commands for generating the data in each of the figures in the paper and plotting them. All commands should be run on the _driver_ machine, not the _test_ machine.
 
 Generating all of the results is _very_ time consuming and resource intensive. The following table shows the time to run each workload (on our _test_ machine), as the reviewer may want to generate partial results from the paper in the interest of time.
 
@@ -181,16 +184,25 @@ To produce this figure, we must first get a sense of the address space layout of
 
 We give only examples here, but the full set of commands to run experiments is included in `./scripts/figure-1.sh`. (TODO) We also provide the final output profiles in `profiles/`.
 
-1. Collect `/proc/[pid]/smaps` for each workload. This gives the address space layout for the profiled process.
+Once again, all of these commands are meant to be run on the _driver_ machine, not the _test_ machine.
+
+1. Collect `/proc/[pid]/smaps` for each workload. This gives the address space layout for the profiled process. For example, for `xz`:
 
    ```sh
-   exp00010 {MACHINE} {USER} --smaps_periodic   hacky_spec17 xz --spec_size 76800 --input  training
+   ./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   hacky_spec17 xz --spec_size 76800 --input  training
    ```
 
-2. Process the smaps output and split the address space into 100 equally-sized chunks.
+2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
    ```sh
-   cat /path/to/$OUTPUT.smaps | ./scripts/process-smaps.py
+   mkdir results/
+   rsync -avzP {MACHINE}:~/vm_shared/ results/
+   ```
+
+3. Process the smaps output and split the address space into 100 equally-sized chunks.
+
+   ```sh
+   cat results/$OUTPUT.smaps | ./scripts/process-smaps.py
    ```
 
    Example output:
@@ -207,10 +219,13 @@ We give only examples here, but the full set of commands to run experiments is i
    0xffffffffff600000 0xffffffffff601000 0 {'[vsyscall]'}
    ```
 
-   Manually select ranges to profile...
+   Manually select ranges to profile. Usually, this is the largest mapped area from the output of `process-smaps.py`. In the example above, we would likely want to use `0x7fcbefc00000 - 0x7ffff7dfd000`.
 
    ```sh
    ./scripts/huge_range_compute.py <start> <end> <nslices> | tail -n 1
+
+   # For example:
+   ./scripts/huge_range_compute.py 0x7fcbefc00000 0x7ffff7dfd000 100 | tail -n 1
    ```
 
    Example output:
@@ -221,7 +236,7 @@ We give only examples here, but the full set of commands to run experiments is i
 
    These are the address space slices we will use for our profiling.
 
-3. For each `<start> <end>,...` in the list above, run the following command (we ran each command 5x to reduce variability):
+4. For each `<start> <end>,...` in the list above, run the following command (we ran each command 5x to reduce variability):
 
    ```sh
    ./target/debug/runner exp00010 {MACHINE} {USER}  --thp_huge_addr_ranges {ADDR} \
@@ -238,7 +253,7 @@ We give only examples here, but the full set of commands to run experiments is i
 
    TODO: maybe want to provide a table here so they don't have to generate figure 5 first?
 
-4. For each output file from the experiments above, run `./scripts/extract-ranges3.py` to extract the data from the experiment output. The data will be a collection of metadata and performance counters. We once again used [`jobserver`] to help with this:
+5. For each output file from the experiments above, run `./scripts/extract-ranges3.py` to extract the data from the experiment output. The data will be a collection of metadata and performance counters. We once again used [`jobserver`] to help with this:
 
    ```sh
    j job stat --only_done --results_path mmu --cmd --csv --jid --mapper /nobackup/scripts/extract-ranges3.py --id 59000 > /tmp/data.csv
@@ -246,7 +261,7 @@ We give only examples here, but the full set of commands to run experiments is i
 
    TODO: am I missing the control experiments?
 
-5. We then imported the CSV to spreadsheet software and used it to produce plots and statistics.
+6. We then imported the CSV to spreadsheet software and used it to produce plots and statistics.
 
 [`jobserver`]: https://github.com/mark-i-m/jobserver
 
@@ -281,19 +296,27 @@ These experiments measure page fault latency on Linux (v5.5.8) for each of the w
 
 ### Figure 4
 
-These experiments are similar to Figure 2. They collect the same data as Figure
-2, but on HawkEye and CBMM, too. Additionally, we will process them differently
-to generate different plots.
+These experiments are similar to Figure 2. They collect the same data as Figure 2, but on HawkEye and CBMM, too. Additionally, we will process them differently to generate different plots. Note that you will need to run experiments with both kernel configurations (Linux/CBMM and HawkEye; see Getting Started, step 5).
 
 1. Run the experiments.
 
    Note that we can reuse the results from the Figure 2 experiments for Linux, so `figure-4.sh` does not run them.
 
-   Note that this script runs all experiments sequentially, which would take multiple days. Feel free to comment out some experiments (lines in the `figure-4.sh` script) to produce partial results.
+   Note that these scripts runs all experiments sequentially, which would take multiple days. Feel free to comment out some experiments (lines in the `figure-4-*.sh` scripts) to produce partial results.
+
+   **Linux/CBMM**
 
     ```sh
     cd cbmm-runner/runner
-    ../../scripts/figure-4.sh
+    ../../scripts/figure-2.sh           # Linux
+    ../../scripts/figure-4-cbmm.sh      # CBMM
+    ```
+
+    **HawkEye**
+
+    ```sh
+    cd cbmm-runner/runner
+    ../../scripts/figure-4-hawkeye.sh
     ```
 
 2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
@@ -328,6 +351,8 @@ to generate different plots.
 
 ### Figure 5
 
+TODO: split the experiments script to have separate HawkEye experiments because they need a different configuration! Also elsewhere...
+
 These experiments capture the total runtime of the workloads for each kernel and fragmentation setting.
 
 1. Run the experiments.
@@ -349,6 +374,8 @@ These experiments capture the total runtime of the workloads for each kernel and
 4. TODO: scripts/plot-perf.py
 
 ### Figure 6
+
+TODO: split the experiments script to have separate HawkEye experiments because they need a different configuration! Also elsewhere...
 
 These experiments capture the amount of each workloads' memory usage covered by huge pages for each kernel and fragmentation setting.
 
