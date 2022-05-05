@@ -346,7 +346,7 @@ These experiments capture the total runtime of the workloads for each kernel and
 
 3. Process the output... TODO
 
-4. TODO: plotting
+4. TODO: scripts/plot-perf.py
 
 ### Figure 6
 
@@ -368,7 +368,7 @@ These experiments capture the amount of each workloads' memory usage covered by 
 
 3.  Process the output... TODO
 
-4. TODO: plotting
+4. TODO: scripts/plot-hp-efficiency.py
 
 ### Section 5.5
 
