@@ -301,6 +301,8 @@ to generate different plots.
 
 3. Process the output to compute the page fault rate for each workload.
 
+   TODO: maybe want to provide a table here so they don't have to generate figure 5 first?
+
    TODO
 
 4. Process the output to generate plots. For each workload, let
