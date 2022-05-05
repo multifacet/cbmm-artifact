@@ -20,7 +20,7 @@ The CBMM kernel runs on the _test_ machine, while the `runner` program runs on t
 
 ## Artifact Claims
 
-TODO
+Running the experiments as specified below on similar hardware to our own setup (described in Section 5.1) should allow the reviewer to generate comparable results to those in the accepted version of the paper, including tail latency, performance, huge page usage, and generality results.
 
 ## Hardware and Software Requirements
 
@@ -159,7 +159,17 @@ In each case, the _test_ machine will be reboot, will have a bunch of configurat
 We provide commands for generating the data in each of the figures in the
 paper and plotting them.
 
-TODO: include table of approximate running times for each workload.
+Generating all of the results is _very_ time consuming and resource intensive. The following table shows the time to run each workload (on our _test_ machine), as the reviewer may want to generate partial results from the paper in the interest of time.
+
+Workload | Rought time estimate
+---------+---------------------
+xz          | 3 hours
+mcf         | 20 minutes
+canneal     | 4 hours
+mongodb     | 4 hours
+memcached   | 30 minutes
+mix         | 1 hour
+thp\_ubmk   | 10 minutes
 
 ### Figure 1
 
@@ -287,20 +297,25 @@ to generate different plots.
    rsync -avzP {MACHINE}:~/vm_shared/ results/
    ```
 
-3. Process the output to generate plots. For each workload, let
-   - `$LINUX_RESULTS` be the results of the Linux experiment for that workload and fragmentation setting,
+3. Process the output to compute the page fault rate for each workload.
+
+   TODO
+
+4. Process the output to generate plots. For each workload, let
+   - `$LINUX_RESULTS` be the results of the Linux experiment for this workload and fragmentation setting,
+   - `$LINUX_SCALE` be the page fault rate in faults/second for this workload and fragmentation setting, as computed in the previous step,
    - `$HAWKEYE_RESULTS` be the results of the Hawkeye experiment ...
+   - `$HAWKEYE_SCALE` be the page fault rate in faults/second,
    - `$CBMM_RESULTS` be the results of the CBMM experiment...
+   - `$CBMM_SCALE` be the page fault rate in faults/second,
 
    Then, we can produce the subplot of Figure 4 representing a particular workload and fragmentation setting as follows:
 
-   # TODO obviate manual editing
-   # TODO scale and page fault rate...
    ```sh
-   /nobackup/linux-mm-econ/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $LINUX_RESULTS.{pftrace,rejected} 10000 > /tmp/tails.txt
-   /nobackup/linux-mm-econ/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $CBMM_RESULTS.{pftrace,rejected} 10000 >> /tmp/tails.txt
-   FREQ=2600 /nobackup/scripts/bpf-pftrace-percentiles.py $HAWKEYE_RESULTS.pftrace 3846 10 >> /tmp/tails.txt
-   OUTFNAME=tails-mix PDF=1 FREQ=2200 SCALE="17.55 52.42 39.88" ./scripts/tail-cdf.py 10 $(cat /tmp/tails.txt)
+   /nobackup/linux-mm-econ/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $LINUX_RESULTS.{pftrace,rejected} 10000 | sed 's|none([0-9]\+)|Linux|' > /tmp/tails.txt
+   /nobackup/linux-mm-econ/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $CBMM_RESULTS.{pftrace,rejected} 10000 | sed 's|none([0-9]\+)|CBMM|' >> /tmp/tails.txt
+   FREQ=2600 /nobackup/scripts/bpf-pftrace-percentiles.py $HAWKEYE_RESULTS.pftrace 3846 10 | sed 's|none([0-9]\+)|HawkEye|' >> /tmp/tails.txt
+   OUTFNAME=tails-mix PDF=1 FREQ=2200 SCALE="$LINUX_SCALE $CBMM_SCALE $HAWKEYE_SCALE" ./scripts/tail-cdf.py 10 $(cat /tmp/tails.txt)
    ```
 
 ### Figure 5
