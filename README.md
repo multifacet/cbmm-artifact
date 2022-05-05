@@ -22,6 +22,8 @@ The CBMM kernel runs on the _test_ machine, while the `runner` program runs on t
 
 Running the experiments as specified below on similar hardware to our own setup (described in Section 5.1) should allow the reviewer to generate comparable results to those in the accepted version of the paper, including tail latency, performance, huge page usage, and generality results.
 
+TODO: Because that is extremely time consuming, we provide a screencast and intermediate results for the reviewers. This should allow generation of checkable partial results in a reasonable amount of time.
+
 ## Hardware and Software Requirements
 
 _Driver_ machine:
@@ -320,161 +322,47 @@ to generate different plots.
 
 ### Figure 5
 
-**Linux, without fragmentation**
+These experiments capture the total runtime of the workloads for each kernel and fragmentation setting.
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER}    hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER}    hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER}    canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER}    mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER}    memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER}    mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER}    thp_ubmk 150
-```
+1. Run the experiments.
 
-**Linux, with fragmentation**
+   ```sh
+   cd cbmm-runner/runner
+   ../../scripts/figure-5.sh
+   ```
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100  hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100  hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100  canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100  mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100  memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER}  --fragmentation 100  mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100  thp_ubmk 150
-```
+2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
-**HawkEye, without fragmentation**
+   ```sh
+   mkdir results/
+   rsync -avzP {MACHINE}:~/vm_shared/ results/
+   ```
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER}   --hawkeye hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER}   --hawkeye hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER}   --hawkeye canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER}   --hawkeye mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER}   --hawkeye memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER}   --hawkeye --hawkeye_debloat memhog mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER}   --hawkeye thp_ubmk 150
-```
+3. Process the output... TODO
 
-**HawkEye, with fragmentation**
-
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --hawkeye hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --hawkeye hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --hawkeye canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --hawkeye mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --hawkeye memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER}  --fragmentation 100 --hawkeye --hawkeye_debloat memhog mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --hawkeye thp_ubmk 150
-```
-
-**CBMM, without fragmentation**
-
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file ./profiles/xz-training.csv hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mcf.csv hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file ./profiles/canneal.csv canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mongodb.csv mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file ./profiles/memcached.csv memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefits redis-server ./profiles/mix-redis.csv mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file ./profiles/thp-ubmk.csv thp_ubmk 150
-```
-
-**CBMM, with fragmentation**
-
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/xz-training.csv hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mcf.csv hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/canneal.csv canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mongodb.csv mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/memcached.csv memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefits redis-server ./profiles/mix-redis.csv mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/thp-ubmk.csv thp_ubmk 150
-```
-
-TODO: plotting
+4. TODO: plotting
 
 ### Figure 6
 
-**Linux, without fragmentation**
+These experiments capture the amount of each workloads' memory usage covered by huge pages for each kernel and fragmentation setting.
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --smaps_periodic --instrument redis-server   mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   thp_ubmk 150
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   redisycsb 50 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-```
+1. Run the experiments.
 
-**Linux, with fragmentation**
+   ```sh
+   cd cbmm-runner/runner
+   ./scripts/figure-6.sh
+   ```
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100  hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100  hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100  canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100  mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100  memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --smaps_periodic --instrument redis-server --fragmentation 100  mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100  thp_ubmk 150
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100  redisycsb 50 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-```
+2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
-**HawkEye, without fragmentation**
+   ```sh
+   mkdir results/
+   rsync -avzP {MACHINE}:~/vm_shared/ results/
+   ```
 
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --hawkeye hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --hawkeye hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --hawkeye canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --hawkeye mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --hawkeye memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --smaps_periodic --instrument redis-server  --hawkeye --hawkeye_debloat memhog mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --hawkeye thp_ubmk 150
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --hawkeye redisycsb 50 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-```
+3.  Process the output... TODO
 
-**HawkEye, with fragmentation**
-
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --hawkeye hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --hawkeye hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --hawkeye canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --hawkeye mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --hawkeye memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --smaps_periodic --instrument redis-server --fragmentation 100 --hawkeye --hawkeye_debloat memhog mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --hawkeye thp_ubmk 150
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --hawkeye redisycsb 50 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-```
-
-**CBMM, without fragmentation**
-
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/xz-training.csv hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mcf.csv hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/canneal.csv canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mongodb.csv mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/memcached.csv memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --smaps_periodic --instrument redis-server  --asynczero --mm_econ --mm_econ_benefits redis-server ./profiles/mix-redis.csv mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/thp-ubmk.csv thp_ubmk 150
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic  --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mix-redis.csv redisycsb 50 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-```
-
-**CBMM, with fragmentation**
-
-```sh
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/xz-training.csv hacky_spec17 xz --spec_size 76800 --input  testing
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mcf.csv hacky_spec17 mcf
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/canneal.csv canneal --rand 530000000
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mongodb.csv mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/memcached.csv memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
-./target/debug/runner exp00012 {MACHINE} {USER} --smaps_periodic --instrument redis-server --fragmentation 100 --asynczero --mm_econ --mm_econ_benefits redis-server ./profiles/mix-redis.csv mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/thp-ubmk.csv thp_ubmk 150
-./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mix-redis.csv redisycsb 50 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
-```
-
-TODO: plotting
+4. TODO: plotting
 
 ### Section 5.5
 
