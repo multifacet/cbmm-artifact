@@ -176,6 +176,59 @@ Generating all of the results is _very_ time consuming and resource intensive. T
 | mix         | 1 hour               |
 | thp\_ubmk   | 10 minutes           |
 
+Also in the interest of the reviewer's time, we would recommend running Linux/CBMM experiments for multiple figures before switching configurations to run HawkEye experiments. This will reduce time spent switching between kernels.
+
+### Figure 5
+
+TODO: in the paper, we run each one 5x. Should we recommend reviewers do the same?
+
+Start with Figure 5 because these results are used in some of the other figures too (e.g., to compute page fault rate). These experiments capture the total runtime of the workloads for each kernel and fragmentation setting. Note that you will need to run experiments with both kernel configurations (Linux/CBMM and HawkEye; see Getting Started, step 5).
+
+1. Run the experiments.
+
+   **Linux/CBMM**
+
+   ```sh
+   cd cbmm-runner/runner
+   ../../scripts/figure-5-linux-cbmm.sh
+   ```
+
+   **HawkEye**
+
+   ```sh
+   cd cbmm-runner/runner
+   ../../scripts/figure-5-hawkeye.sh
+   ```
+
+2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
+
+   ```sh
+   mkdir results/
+   rsync -avzP {MACHINE}:~/vm_shared/ results/
+   ```
+
+3. Process the output. For each experiment, we want to get the total runtime.
+
+   For `xz`, `mcf`, `canneal`, TODO, the correct value can be found in the `$OUTPUT.runtime` file from the experiment's output.
+
+   ```sh
+   cat $OUTPUT.runtime
+   ```
+
+   For `mongodb`, TODO, the correct value is the OVERALL Runtime:
+
+   ```sh
+   cat $OUTPUT.runtime | grep OVERALL | grep RunTime | awk '{print $3}'
+   ```
+
+   TODO: generate the CSV
+
+4. Pass the CSV to the plotting script to produce Figure 5:
+
+   ```sh
+   ./scripts/plot-perf.py $DATA.csv
+   ```
+
 ### Figure 1
 
 **NOTE**: This figure contains the results of ~4000 experiments. It took two students one month to run all experiments on ~50 machines. We include the commands for completeness, but we also include the final results (the profiles) in `profiles/`, for your use in the remaining experiments.
@@ -250,8 +303,6 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
    ```sh
    j job matrix add -x 5 --timeout 600 --max_failures 5 exp-c220g5 "exp00010 {MACHINE} {USER}  --thp_huge_addr_ranges {ADDR} --end  --mmu_overhead    hacky_spec17 xz --spec_size 76800 --input  training" /p/multifacet/users/markm/results3/cbmm/ "ADDR=0x0 0x7fcc76400000,0x7fcc76400000 0x7fccfcc00000,0x7fccfcc00000 0x7fcd83400000,0x7fcd83400000 0x7fce09c00000,0x7fce09c00000 0x7fce90400000,0x7fce90400000 0x7fcf16c00000,0x7fcf16c00000 0x7fcf9d400000,0x7fcf9d400000 0x7fd023c00000,0x7fd023c00000 0x7fd0aa400000,0x7fd0aa400000 0x7fd130c00000,0x7fd130c00000 0x7fd1b7400000,0x7fd1b7400000 0x7fd23dc00000,0x7fd23dc00000 0x7fd2c4400000,0x7fd2c4400000 0x7fd34ac00000,0x7fd34ac00000 0x7fd3d1400000,0x7fd3d1400000 0x7fd457c00000,0x7fd457c00000 0x7fd4de400000,0x7fd4de400000 0x7fd564c00000,0x7fd564c00000 0x7fd5eb400000,0x7fd5eb400000 0x7fd671c00000,0x7fd671c00000 0x7fd6f8400000,0x7fd6f8400000 0x7fd77ec00000,0x7fd77ec00000 0x7fd805400000,0x7fd805400000 0x7fd88bc00000,0x7fd88bc00000 0x7fd912400000,0x7fd912400000 0x7fd998c00000,0x7fd998c00000 0x7fda1f400000,0x7fda1f400000 0x7fdaa5c00000,0x7fdaa5c00000 0x7fdb2c400000,0x7fdb2c400000 0x7fdbb2c00000,0x7fdbb2c00000 0x7fdc39400000,0x7fdc39400000 0x7fdcbfc00000,0x7fdcbfc00000 0x7fdd46400000,0x7fdd46400000 0x7fddccc00000,0x7fddccc00000 0x7fde53400000,0x7fde53400000 0x7fded9c00000,0x7fded9c00000 0x7fdf60400000,0x7fdf60400000 0x7fdfe6c00000,0x7fdfe6c00000 0x7fe06d400000,0x7fe06d400000 0x7fe0f3c00000,0x7fe0f3c00000 0x7fe17a400000,0x7fe17a400000 0x7fe200c00000,0x7fe200c00000 0x7fe287400000,0x7fe287400000 0x7fe30dc00000,0x7fe30dc00000 0x7fe394400000,0x7fe394400000 0x7fe41ac00000,0x7fe41ac00000 0x7fe4a1400000,0x7fe4a1400000 0x7fe527c00000,0x7fe527c00000 0x7fe5ae400000,0x7fe5ae400000 0x7fe634c00000,0x7fe634c00000 0x7fe6bb400000,0x7fe6bb400000 0x7fe741c00000,0x7fe741c00000 0x7fe7c8400000,0x7fe7c8400000 0x7fe84ec00000,0x7fe84ec00000 0x7fe8d5400000,0x7fe8d5400000 0x7fe95bc00000,0x7fe95bc00000 0x7fe9e2400000,0x7fe9e2400000 0x7fea68c00000,0x7fea68c00000 0x7feaef400000,0x7feaef400000 0x7feb75c00000,0x7feb75c00000 0x7febfc400000,0x7febfc400000 0x7fec82c00000,0x7fec82c00000 0x7fed09400000,0x7fed09400000 0x7fed8fc00000,0x7fed8fc00000 0x7fee16400000,0x7fee16400000 0x7fee9cc00000,0x7fee9cc00000 0x7fef23400000,0x7fef23400000 0x7fefa9c00000,0x7fefa9c00000 0x7ff030400000,0x7ff030400000 0x7ff0b6c00000,0x7ff0b6c00000 0x7ff13d400000,0x7ff13d400000 0x7ff1c3c00000,0x7ff1c3c00000 0x7ff24a400000,0x7ff24a400000 0x7ff2d0c00000,0x7ff2d0c00000 0x7ff357400000,0x7ff357400000 0x7ff3ddc00000,0x7ff3ddc00000 0x7ff464400000,0x7ff464400000 0x7ff4eac00000,0x7ff4eac00000 0x7ff571400000,0x7ff571400000 0x7ff5f7c00000,0x7ff5f7c00000 0x7ff67e400000,0x7ff67e400000 0x7ff704c00000,0x7ff704c00000 0x7ff78b400000,0x7ff78b400000 0x7ff811c00000,0x7ff811c00000 0x7ff898400000,0x7ff898400000 0x7ff91ec00000,0x7ff91ec00000 0x7ff9a5400000,0x7ff9a5400000 0x7ffa2bc00000,0x7ffa2bc00000 0x7ffab2400000,0x7ffab2400000 0x7ffb38c00000,0x7ffb38c00000 0x7ffbbf400000,0x7ffbbf400000 0x7ffc45c00000,0x7ffc45c00000 0x7ffccc400000,0x7ffccc400000 0x7ffd52c00000,0x7ffd52c00000 0x7ffdd9400000,0x7ffdd9400000 0x7ffe5fc00000,0x7ffe5fc00000 0x7ffee6400000,0x7ffee6400000 0x7fff6cc00000,0x7fff6cc00000 0x7ffff3400000,0x7ffff3400000 0x800079c00000"
    ```
-
-   TODO: maybe want to provide a table here so they don't have to generate figure 5 first?
 
 5. For each output file from the experiments above, run `./scripts/extract-ranges3.py` to extract the data from the experiment output. The data will be a collection of metadata and performance counters. We once again used [`jobserver`] to help with this:
 
@@ -349,29 +400,6 @@ These experiments are similar to Figure 2. They collect the same data as Figure 
    OUTFNAME=tails-mix PDF=1 FREQ=2200 SCALE="$LINUX_SCALE $CBMM_SCALE $HAWKEYE_SCALE" ./scripts/tail-cdf.py 10 $(cat /tmp/tails.txt)
    ```
 
-### Figure 5
-
-TODO: split the experiments script to have separate HawkEye experiments because they need a different configuration! Also elsewhere...
-
-These experiments capture the total runtime of the workloads for each kernel and fragmentation setting.
-
-1. Run the experiments.
-
-   ```sh
-   cd cbmm-runner/runner
-   ../../scripts/figure-5.sh
-   ```
-
-2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
-
-   ```sh
-   mkdir results/
-   rsync -avzP {MACHINE}:~/vm_shared/ results/
-   ```
-
-3. Process the output... TODO
-
-4. TODO: scripts/plot-perf.py
 
 ### Figure 6
 
