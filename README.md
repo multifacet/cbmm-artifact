@@ -163,15 +163,15 @@ paper and plotting them.
 
 Generating all of the results is _very_ time consuming and resource intensive. The following table shows the time to run each workload (on our _test_ machine), as the reviewer may want to generate partial results from the paper in the interest of time.
 
-|Workload    | Rought time estimate |
-+------------+----------------------+
-|xz          | 3 hours              |
-|mcf         | 20 minutes           |
-|canneal     | 4 hours              |
-|mongodb     | 4 hours              |
-|memcached   | 30 minutes           |
-|mix         | 1 hour               |
-|thp\_ubmk   | 10 minutes           |
+| Workload    | Rought time estimate |
+|-------------|----------------------|
+| xz          | 3 hours              |
+| mcf         | 20 minutes           |
+| canneal     | 4 hours              |
+| mongodb     | 4 hours              |
+| memcached   | 30 minutes           |
+| mix         | 1 hour               |
+| thp\_ubmk   | 10 minutes           |
 
 ### Figure 1
 
