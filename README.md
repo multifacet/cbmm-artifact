@@ -134,7 +134,9 @@ NOTE: We include `cbmm-runner` and `cbmm` in this repository for archival reason
    cargo build --release
    ```
 
-7. **Congratulations!** You should now have a fully-set-up _driver_ and _test_ machine pair. We can now begin running experiments.
+7. Create a directory on the _driver_ machine (doesn't matter where) to store results generated throughout the evaluation. We will copy results back to this directory from the _test_ machine for further processing and plotting. Throughout this document, we will refer to this directory as `$RESULTS_DIR`.
+
+8. **Congratulations!** You should now have a fully-set-up _driver_ and _test_ machine pair. We can now begin running experiments.
 
 ### Kick the tires (some small tests)
 
@@ -196,6 +198,8 @@ In the remainder of this document we give detailed instructions for generating r
 
 We start with Figure 5 because these results are used in some of the other figures too (e.g., to compute page fault rate). These experiments capture the total runtime of the workloads for each kernel and fragmentation setting. Note that you will need to run experiments with both kernel configurations (Linux/CBMM and HawkEye; see Getting Started, step 5).
 
+Once again, all of these commands are meant to be run on the _driver_ machine, not the _test_ machine.
+
 1. Run the experiments. We recommend repeating this step five times, generating five sets of results, to reduce variance.
 
    **Linux/CBMM**
@@ -212,11 +216,10 @@ We start with Figure 5 because these results are used in some of the other figur
    ../../scripts/figure-5-hawkeye.sh
    ```
 
-2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
+2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression, which can shorten network transfers significantly.
 
    ```sh
-   mkdir results/
-   rsync -avzP {MACHINE}:~/vm_shared/ results/
+   rsync -avzP {MACHINE}:~/vm_shared/ $RESULTS_DIR
    ```
 
 3. Process the output. For each experiment, we want to get the total runtime (median of 5 runs). We found this easiest to do with a spreadsheet. We've provided a blank copy of our spreadsheet [here](TODO). Please refer to [this screencast](TODO) explaining how to use the spreadsheet and generate a CSV of the results for the next step.
@@ -242,18 +245,9 @@ We start with Figure 5 because these results are used in some of the other figur
 
 ### Figure 1
 
-![Figure 1a from the paper (xz).](figures/fig1a.png)
-![Figure 1b from the paper (canneal).](figures/fig1b.png)
-![Figure 1c from the paper (memcached).](figures/fig1c.png)
-![Figure 1d from the paper (mongodb).](figures/fig1d.png)
+<img src="figures/fig1a.png" alt="Figure 1a from the paper (xz)." height="200" /> <img src="figures/fig1b.png" alt="Figure 1b from the paper (canneal)." height="200" /> <img src="figures/fig1c.png" alt="Figure 1c from the paper (memcached)." height="200" /> <img src="figures/fig1d.png" alt="Figure 1d from the paper (mongodb)." height="200" />
 
-**NOTE**: This figure contains the results of ~4000 experiments. It took two students one month to run all experiments on ~50 machines. We include the commands for completeness, but we also include the final results (the profiles) in `profiles/`, for your use in the remaining experiments.
-
-To produce this figure, we must first get a sense of the address space layout of the profiled process and then carry out the profiling, as described in Section 2.1.
-
-We give only examples here, but the full set of commands to run experiments is included in `./scripts/figure-1.sh`. (TODO) We also provide the final output profiles in `profiles/`.
-
-Once again, all of these commands are meant to be run on the _driver_ machine, not the _test_ machine.
+This figure contains the results of ~4000 experiments. Please see [this screencast](TODO) for our procedure to generate these results. The high-level procedure and rationale are described in Section 2.1 of the paper. We give only examples here for brevity, but the full set of commands to run experiments is included in `./scripts/figure-1.sh`. (TODO) We include the commands for completeness, but we also include the final results (the profiles) in `profiles/`, for your use in the remaining experiments.
 
 1. Collect `/proc/[pid]/smaps` for each workload. This gives the address space layout for the profiled process. For example, for `xz`:
 
@@ -264,14 +258,13 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
 2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
    ```sh
-   mkdir results/
-   rsync -avzP {MACHINE}:~/vm_shared/ results/
+   rsync -avzP {MACHINE}:~/vm_shared/ $RESULTS_DIR
    ```
 
 3. Process the smaps output and split the address space into 100 equally-sized chunks.
 
    ```sh
-   cat results/$OUTPUT.smaps | ./scripts/process-smaps.py
+   cat $RESULTS_DIR/$OUTPUT.smaps | ./scripts/process-smaps.py
    ```
 
    Example output:
@@ -317,18 +310,28 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
    We used [`jobserver`] to manage this set of experiments for us:
 
    ```sh
-   j job matrix add -x 5 --timeout 600 --max_failures 5 exp-c220g5 "exp00010 {MACHINE} {USER}  --thp_huge_addr_ranges {ADDR} --end  --mmu_overhead    hacky_spec17 xz --spec_size 76800 --input  training" /p/multifacet/users/markm/results3/cbmm/ "ADDR=0x0 0x7fcc76400000,0x7fcc76400000 0x7fccfcc00000,0x7fccfcc00000 0x7fcd83400000,0x7fcd83400000 0x7fce09c00000,0x7fce09c00000 0x7fce90400000,0x7fce90400000 0x7fcf16c00000,0x7fcf16c00000 0x7fcf9d400000,0x7fcf9d400000 0x7fd023c00000,0x7fd023c00000 0x7fd0aa400000,0x7fd0aa400000 0x7fd130c00000,0x7fd130c00000 0x7fd1b7400000,0x7fd1b7400000 0x7fd23dc00000,0x7fd23dc00000 0x7fd2c4400000,0x7fd2c4400000 0x7fd34ac00000,0x7fd34ac00000 0x7fd3d1400000,0x7fd3d1400000 0x7fd457c00000,0x7fd457c00000 0x7fd4de400000,0x7fd4de400000 0x7fd564c00000,0x7fd564c00000 0x7fd5eb400000,0x7fd5eb400000 0x7fd671c00000,0x7fd671c00000 0x7fd6f8400000,0x7fd6f8400000 0x7fd77ec00000,0x7fd77ec00000 0x7fd805400000,0x7fd805400000 0x7fd88bc00000,0x7fd88bc00000 0x7fd912400000,0x7fd912400000 0x7fd998c00000,0x7fd998c00000 0x7fda1f400000,0x7fda1f400000 0x7fdaa5c00000,0x7fdaa5c00000 0x7fdb2c400000,0x7fdb2c400000 0x7fdbb2c00000,0x7fdbb2c00000 0x7fdc39400000,0x7fdc39400000 0x7fdcbfc00000,0x7fdcbfc00000 0x7fdd46400000,0x7fdd46400000 0x7fddccc00000,0x7fddccc00000 0x7fde53400000,0x7fde53400000 0x7fded9c00000,0x7fded9c00000 0x7fdf60400000,0x7fdf60400000 0x7fdfe6c00000,0x7fdfe6c00000 0x7fe06d400000,0x7fe06d400000 0x7fe0f3c00000,0x7fe0f3c00000 0x7fe17a400000,0x7fe17a400000 0x7fe200c00000,0x7fe200c00000 0x7fe287400000,0x7fe287400000 0x7fe30dc00000,0x7fe30dc00000 0x7fe394400000,0x7fe394400000 0x7fe41ac00000,0x7fe41ac00000 0x7fe4a1400000,0x7fe4a1400000 0x7fe527c00000,0x7fe527c00000 0x7fe5ae400000,0x7fe5ae400000 0x7fe634c00000,0x7fe634c00000 0x7fe6bb400000,0x7fe6bb400000 0x7fe741c00000,0x7fe741c00000 0x7fe7c8400000,0x7fe7c8400000 0x7fe84ec00000,0x7fe84ec00000 0x7fe8d5400000,0x7fe8d5400000 0x7fe95bc00000,0x7fe95bc00000 0x7fe9e2400000,0x7fe9e2400000 0x7fea68c00000,0x7fea68c00000 0x7feaef400000,0x7feaef400000 0x7feb75c00000,0x7feb75c00000 0x7febfc400000,0x7febfc400000 0x7fec82c00000,0x7fec82c00000 0x7fed09400000,0x7fed09400000 0x7fed8fc00000,0x7fed8fc00000 0x7fee16400000,0x7fee16400000 0x7fee9cc00000,0x7fee9cc00000 0x7fef23400000,0x7fef23400000 0x7fefa9c00000,0x7fefa9c00000 0x7ff030400000,0x7ff030400000 0x7ff0b6c00000,0x7ff0b6c00000 0x7ff13d400000,0x7ff13d400000 0x7ff1c3c00000,0x7ff1c3c00000 0x7ff24a400000,0x7ff24a400000 0x7ff2d0c00000,0x7ff2d0c00000 0x7ff357400000,0x7ff357400000 0x7ff3ddc00000,0x7ff3ddc00000 0x7ff464400000,0x7ff464400000 0x7ff4eac00000,0x7ff4eac00000 0x7ff571400000,0x7ff571400000 0x7ff5f7c00000,0x7ff5f7c00000 0x7ff67e400000,0x7ff67e400000 0x7ff704c00000,0x7ff704c00000 0x7ff78b400000,0x7ff78b400000 0x7ff811c00000,0x7ff811c00000 0x7ff898400000,0x7ff898400000 0x7ff91ec00000,0x7ff91ec00000 0x7ff9a5400000,0x7ff9a5400000 0x7ffa2bc00000,0x7ffa2bc00000 0x7ffab2400000,0x7ffab2400000 0x7ffb38c00000,0x7ffb38c00000 0x7ffbbf400000,0x7ffbbf400000 0x7ffc45c00000,0x7ffc45c00000 0x7ffccc400000,0x7ffccc400000 0x7ffd52c00000,0x7ffd52c00000 0x7ffdd9400000,0x7ffdd9400000 0x7ffe5fc00000,0x7ffe5fc00000 0x7ffee6400000,0x7ffee6400000 0x7fff6cc00000,0x7fff6cc00000 0x7ffff3400000,0x7ffff3400000 0x800079c00000"
+   j job matrix add -x 5 --timeout 600 --max_failures 5 exp-c220g5 "exp00010 {MACHINE} {USER}  --thp_huge_addr_ranges {ADDR} --end  --mmu_overhead    hacky_spec17 xz --spec_size 76800 --input  training" $RESULTS_DIR "ADDR=0x0 0x7fcc76400000,0x7fcc76400000 0x7fccfcc00000,0x7fccfcc00000 0x7fcd83400000,0x7fcd83400000 0x7fce09c00000,0x7fce09c00000 0x7fce90400000,0x7fce90400000 0x7fcf16c00000,0x7fcf16c00000 0x7fcf9d400000,0x7fcf9d400000 0x7fd023c00000,0x7fd023c00000 0x7fd0aa400000,0x7fd0aa400000 0x7fd130c00000,0x7fd130c00000 0x7fd1b7400000,0x7fd1b7400000 0x7fd23dc00000,0x7fd23dc00000 0x7fd2c4400000,0x7fd2c4400000 0x7fd34ac00000,0x7fd34ac00000 0x7fd3d1400000,0x7fd3d1400000 0x7fd457c00000,0x7fd457c00000 0x7fd4de400000,0x7fd4de400000 0x7fd564c00000,0x7fd564c00000 0x7fd5eb400000,0x7fd5eb400000 0x7fd671c00000,0x7fd671c00000 0x7fd6f8400000,0x7fd6f8400000 0x7fd77ec00000,0x7fd77ec00000 0x7fd805400000,0x7fd805400000 0x7fd88bc00000,0x7fd88bc00000 0x7fd912400000,0x7fd912400000 0x7fd998c00000,0x7fd998c00000 0x7fda1f400000,0x7fda1f400000 0x7fdaa5c00000,0x7fdaa5c00000 0x7fdb2c400000,0x7fdb2c400000 0x7fdbb2c00000,0x7fdbb2c00000 0x7fdc39400000,0x7fdc39400000 0x7fdcbfc00000,0x7fdcbfc00000 0x7fdd46400000,0x7fdd46400000 0x7fddccc00000,0x7fddccc00000 0x7fde53400000,0x7fde53400000 0x7fded9c00000,0x7fded9c00000 0x7fdf60400000,0x7fdf60400000 0x7fdfe6c00000,0x7fdfe6c00000 0x7fe06d400000,0x7fe06d400000 0x7fe0f3c00000,0x7fe0f3c00000 0x7fe17a400000,0x7fe17a400000 0x7fe200c00000,0x7fe200c00000 0x7fe287400000,0x7fe287400000 0x7fe30dc00000,0x7fe30dc00000 0x7fe394400000,0x7fe394400000 0x7fe41ac00000,0x7fe41ac00000 0x7fe4a1400000,0x7fe4a1400000 0x7fe527c00000,0x7fe527c00000 0x7fe5ae400000,0x7fe5ae400000 0x7fe634c00000,0x7fe634c00000 0x7fe6bb400000,0x7fe6bb400000 0x7fe741c00000,0x7fe741c00000 0x7fe7c8400000,0x7fe7c8400000 0x7fe84ec00000,0x7fe84ec00000 0x7fe8d5400000,0x7fe8d5400000 0x7fe95bc00000,0x7fe95bc00000 0x7fe9e2400000,0x7fe9e2400000 0x7fea68c00000,0x7fea68c00000 0x7feaef400000,0x7feaef400000 0x7feb75c00000,0x7feb75c00000 0x7febfc400000,0x7febfc400000 0x7fec82c00000,0x7fec82c00000 0x7fed09400000,0x7fed09400000 0x7fed8fc00000,0x7fed8fc00000 0x7fee16400000,0x7fee16400000 0x7fee9cc00000,0x7fee9cc00000 0x7fef23400000,0x7fef23400000 0x7fefa9c00000,0x7fefa9c00000 0x7ff030400000,0x7ff030400000 0x7ff0b6c00000,0x7ff0b6c00000 0x7ff13d400000,0x7ff13d400000 0x7ff1c3c00000,0x7ff1c3c00000 0x7ff24a400000,0x7ff24a400000 0x7ff2d0c00000,0x7ff2d0c00000 0x7ff357400000,0x7ff357400000 0x7ff3ddc00000,0x7ff3ddc00000 0x7ff464400000,0x7ff464400000 0x7ff4eac00000,0x7ff4eac00000 0x7ff571400000,0x7ff571400000 0x7ff5f7c00000,0x7ff5f7c00000 0x7ff67e400000,0x7ff67e400000 0x7ff704c00000,0x7ff704c00000 0x7ff78b400000,0x7ff78b400000 0x7ff811c00000,0x7ff811c00000 0x7ff898400000,0x7ff898400000 0x7ff91ec00000,0x7ff91ec00000 0x7ff9a5400000,0x7ff9a5400000 0x7ffa2bc00000,0x7ffa2bc00000 0x7ffab2400000,0x7ffab2400000 0x7ffb38c00000,0x7ffb38c00000 0x7ffbbf400000,0x7ffbbf400000 0x7ffc45c00000,0x7ffc45c00000 0x7ffccc400000,0x7ffccc400000 0x7ffd52c00000,0x7ffd52c00000 0x7ffdd9400000,0x7ffdd9400000 0x7ffe5fc00000,0x7ffe5fc00000 0x7ffee6400000,0x7ffee6400000 0x7fff6cc00000,0x7fff6cc00000 0x7ffff3400000,0x7ffff3400000 0x800079c00000"
    ```
 
 5. For each output file from the experiments above, run `./scripts/extract-ranges3.py` to extract the data from the experiment output. The data will be a collection of metadata and performance counters. We once again used [`jobserver`] to help with this:
 
    ```sh
-   j job stat --only_done --results_path mmu --cmd --csv --jid --mapper /nobackup/scripts/extract-ranges3.py --id 59000 > /tmp/data.csv
+   j job stat --only_done --results_path mmu --cmd --csv --jid --mapper /nobackup/scripts/extract-ranges3.py --id $MATRIX_ID_FROM_PREVIOUS_CMD > /tmp/data.csv
    ```
 
-   TODO: am I missing the control experiments?
+6. We also want to run the control experiments (no huge pages and Linux THP):
 
-6. We then imported the CSV to spreadsheet software and used it to produce plots and statistics.
+   ```sh
+   j job matrix add -x 5 --timeout 600 --max_failures 5 exp-c220g5 "exp00010 {MACHINE} {USER}  {THP}  --mmu_overhead    hacky_spec17 xz --spec_size 76800 --input  training" $RESULTS_DIR "THP=,--disable_thp"
+   ```
+
+7. As with the range experiments, we want to extract the data form the experimental output as a CSV:
+
+   ```sh
+   j job stat --only_done --results_path mmu --cmd --csv --jid --mapper /nobackup/scripts/extract3.py --id $MATRIX_ID_FROM_PREVIOUS_CMD > /tmp/data-nt.csv
+   ```
+
+8. We then imported the CSV to spreadsheet software and used it to produce plots and statistics. Please see [the aforementioned screencast](TODO).
 
 [`jobserver`]: https://github.com/mark-i-m/jobserver
 
@@ -348,11 +351,10 @@ These experiments measure page fault latency on Linux (v5.5.8) for each of the w
 2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
    ```sh
-   mkdir results/
-   rsync -avzP {MACHINE}:~/vm_shared/ results/
+   rsync -avzP {MACHINE}:~/vm_shared/ $RESULTS_DIR
    ```
 
-3. Process the output to generate plots. For each workload, let `$RESULTS_PATH` be the path to the output (in the `results/` directory we just created). Then, the following command generates the subplots of Figure 2:
+3. Process the output to generate plots. For each workload, let `$RESULTS_PATH` be the path to the output (in the `$RESULTS_DIR` directory). Then, the following command generates the subplots of Figure 2:
 
    ```sh
    cd cbmm-artifact
@@ -389,8 +391,7 @@ These experiments are similar to Figure 2. They collect the same data as Figure 
 2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
    ```sh
-   mkdir results/
-   rsync -avzP {MACHINE}:~/vm_shared/ results/
+   rsync -avzP {MACHINE}:~/vm_shared/ $RESULTS_DIR
    ```
 
 3. Process the output to compute the page fault rate for each workload.
@@ -433,8 +434,7 @@ These experiments capture the amount of each workloads' memory usage covered by 
 2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
    ```sh
-   mkdir results/
-   rsync -avzP {MACHINE}:~/vm_shared/ results/
+   rsync -avzP {MACHINE}:~/vm_shared/ $RESULTS_DIR
    ```
 
 3.  Process the output... TODO
