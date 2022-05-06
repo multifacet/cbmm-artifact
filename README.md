@@ -177,7 +177,7 @@ In each case, the _test_ machine will be reboot, will have a bunch of configurat
 
 We provide commands for generating the data in each of the figures in the paper and plotting them. All commands should be run on the _driver_ machine, not the _test_ machine.
 
-In the paper, we run most experiments five times and use the median to reduce variance; we recommend the reviewers also do so.
+In the paper, we run most experiments five times and use the median to reduce variance; we recommend the reviewers also do so. Often, collecting and processing results is tedious and/or error prone to do by hand, so we provide several spreadsheet templates we used ourselves, along with several screencasts explaining how to use them.
 
 Generating all of the results is time and resource intensive (it took two of the authors two weeks on ~50 machines). The following table shows the time it took us to run a single experiment of each workload. The reviewer may want to generate partial results from the paper in the interest of time.
 
