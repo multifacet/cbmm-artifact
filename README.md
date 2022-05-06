@@ -433,47 +433,51 @@ These experiments are similar to Figure 2. They collect the same data as Figure 
 
    Workload | Kernel | Page Fault Rate
    ---------|--------|----------------
-   xz       | Linux  | TODO
-   memcached| Linux  | TODO
-   mcf      | Linux  | TODO
-   mongodb  | Linux  | TODO
-   canneal  | Linux  | TODO
-   mix      | Linux  | TODO
-   xz       | CBMM   | TODO
-   memcached| CBMM   | TODO
-   mcf      | CBMM   | TODO
-   mongodb  | CBMM   | TODO
-   canneal  | CBMM   | TODO
-   mix      | CBMM   | TODO
-   xz       | HawkEye| TODO
-   memcached| HawkEye| TODO
-   mcf      | HawkEye| TODO
-   mongodb  | HawkEye| TODO
-   canneal  | HawkEye| TODO
-   mix      | HawkEye| TODO
+   xz       | Linux  | 0.64
+   memcached| Linux  | 0.67
+   mcf      | Linux  | 0.04
+   mongodb  | Linux  | 2.53
+   canneal  | Linux  | 1.88
+   mix      | Linux  | 17.55
+   ---------|--------|-----------------
+   xz       | CBMM   | 13.23
+   memcached| CBMM   | 26.84
+   mcf      | CBMM   | 0.84
+   mongodb  | CBMM   | 1.70
+   canneal  | CBMM   | 6.91
+   mix      | CBMM   | 48.63
+   ---------|--------|-----------------
+   xz       | HawkEye| 8.48
+   memcached| HawkEye| 32.49
+   mcf      | HawkEye| 0.19
+   mongodb  | HawkEye| 7.72
+   canneal  | HawkEye| --
+   mix      | HawkEye| 39.88
 
    **Fragmented**
 
    Workload | Kernel | Page Fault Rate
    ---------|--------|----------------
-   xz       | Linux  | TODO
-   memcached| Linux  | TODO
-   mcf      | Linux  | TODO
-   mongodb  | Linux  | TODO
-   canneal  | Linux  | TODO
-   mix      | Linux  | TODO
-   xz       | CBMM   | TODO
-   memcached| CBMM   | TODO
-   mcf      | CBMM   | TODO
-   mongodb  | CBMM   | TODO
-   canneal  | CBMM   | TODO
-   mix      | CBMM   | TODO
-   xz       | HawkEye| TODO
-   memcached| HawkEye| TODO
-   mcf      | HawkEye| TODO
-   mongodb  | HawkEye| TODO
-   canneal  | HawkEye| TODO
-   mix      | HawkEye| TODO
+   xz       | Linux  | 4.54
+   memcached| Linux  | 1.49
+   mcf      | Linux  | 0.12
+   mongodb  | Linux  | 2.55
+   canneal  | Linux  | 1.52
+   mix      | Linux  | 17.73
+   ---------|--------|-----------------
+   xz       | CBMM   | 13.32
+   memcached| CBMM   | 66.65
+   mcf      | CBMM   | 3.13
+   mongodb  | CBMM   | 2.94
+   canneal  | CBMM   | 6.31
+   mix      | CBMM   | 63.66
+   ---------|--------|-----------------
+   xz       | HawkEye| 8.29
+   memcached| HawkEye| 55.82
+   mcf      | HawkEye| 9.45
+   mongodb  | HawkEye| 3.45
+   canneal  | HawkEye| 5.31
+   mix      | HawkEye| 58.54
 
 4. Process the output to generate plots. For each workload, let
    - `$LINUX_SCALE` be the page fault rate in faults/second for this workload and fragmentation setting, as computed in the previous step,
