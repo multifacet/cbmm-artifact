@@ -182,7 +182,7 @@ In the paper, Linux 5.5.8 is the comparison baseline, HawkEye is an additional c
 
 ### Figure 5
 
-![Figure 5 from the paper.](fig5.png)
+![Figure 5 from the paper.](figures/fig5.png)
 
 Start with Figure 5 because these results are used in some of the other figures too (e.g., to compute page fault rate). These experiments capture the total runtime of the workloads for each kernel and fragmentation setting. Note that you will need to run experiments with both kernel configurations (Linux/CBMM and HawkEye; see Getting Started, step 5).
 
