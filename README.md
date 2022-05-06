@@ -340,7 +340,7 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
 
 ### Figure 2
 
-<img src="fig2-lgd.png" alt="Legend of Figure 2" />
+<img src="figures/fig2-lgd.png" alt="Legend of Figure 2" />
 
 <img src="figures/fig2a.png" alt="Figure 2a (canneal)" height="200" /> <img src="figures/fig2b.png" alt="Figure 2b (memcached)" height="200" /> <img src="figures/fig2c.png" alt="Figure 2c (mongodb)" height="200" /> <img src="figures/fig2d.png" alt="Figure 2d (dc-mix)" height="200" />
 
