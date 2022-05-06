@@ -13,6 +13,7 @@ This artifact contains:
    - Convenience scripts for running experiments (more in "Detailed Instructions"),
    - Scripts for processing experimental output into a consumable/plottable form,
    - Scripts for plotting experimental results to generate the figures from the paper.
+- `figures/`: copies of the figures from the paper.
 
 Since our artifact is a kernel, our evaluation uses two machines: one to drive experiments (the _driver_ machine) and one for the experiments to run on (the _test_ machine). We do it this way so that our experiments can run on bare metal without virtualization overheads to muddle the results. We use two separate machines because it makes automation and scripting easier.
 
@@ -240,6 +241,11 @@ We start with Figure 5 because these results are used in some of the other figur
    ```
 
 ### Figure 1
+
+![Figure 1a from the paper (xz).](figures/fig1a.png)
+![Figure 1b from the paper (canneal).](figures/fig1b.png)
+![Figure 1c from the paper (memcached).](figures/fig1c.png)
+![Figure 1d from the paper (mongodb).](figures/fig1d.png)
 
 **NOTE**: This figure contains the results of ~4000 experiments. It took two students one month to run all experiments on ~50 machines. We include the commands for completeness, but we also include the final results (the profiles) in `profiles/`, for your use in the remaining experiments.
 
