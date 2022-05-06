@@ -341,7 +341,8 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
 ### Figure 2
 
 <img src="fig2-lgd.png" alt="Legend of Figure 2" />
-<img src="fig2a.png" alt="Figure 2a (canneal)" height="200" /> <img src="fig2b.png" alt="Figure 2b (memcached)" height="200" /> <img src="fig2c.png" alt="Figure 2c (mongodb)" height="200" /> <img src="fig2d.png" alt="Figure 2d (dc-mix)" height="200" />
+
+<img src="figures/fig2a.png" alt="Figure 2a (canneal)" height="200" /> <img src="figures/fig2b.png" alt="Figure 2b (memcached)" height="200" /> <img src="figures/fig2c.png" alt="Figure 2c (mongodb)" height="200" /> <img src="figures/fig2d.png" alt="Figure 2d (dc-mix)" height="200" />
 
 These experiments measure page fault latency on Linux (v5.5.8) for each of the workloads we measured.
 
@@ -372,6 +373,7 @@ These experiments measure page fault latency on Linux (v5.5.8) for each of the w
 ### Figure 4
 
 <img src="figures/fig4-lgd.png" alt="Legend of Figure 4" />
+
 <img src="figures/fig4a.png" alt="Figure 4a (mcf)" height="200" /> <img src="figures/fig4b.png" alt="Figure 4b (xz)" height="200" /> <img src="figures/fig4c.png" alt="Figure 4c (canneal)" height="200" /> <img src="figures/fig4d.png" alt="Figure 4d (memcached)" height="200" /> <img src="figures/fig4e.png" alt="Figure 4e (mongodb)" height="200" /> <img src="figures/fig4f.png" alt="Figure 4f (dc-mix)" height="200" />
 
 These experiments are similar to Figure 2. They collect the same data as Figure 2, but on HawkEye and CBMM, too. Additionally, we will process them differently to generate different plots. Note that you will need to run experiments with both kernel configurations (Linux/CBMM and HawkEye; see Getting Started, step 5).
