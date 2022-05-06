@@ -20,9 +20,15 @@ The CBMM kernel runs on the _test_ machine, while the `runner` program runs on t
 
 ## Artifact Claims
 
-Running the experiments as specified below on similar hardware to our own setup (described in Section 5.1) should allow the reviewer to generate comparable results to those in the accepted version of the paper, including tail latency, performance, huge page usage, and generality results.
+Running the experiments as specified below on similar hardware to our own setup (described in Section 5.1) should allow the reviewer to generate comparable results to those in the accepted version of the paper.
 
-Because that is extremely time consuming, we provide a screencast and intermediate results for the reviewers. This should allow generation of checkable partial results in a reasonable amount of time. (TODO)
+Specifically, our paper's key claims are:
+1. CBMM improves page fault tail latency, our measure of MM system behavioral consistency, compared to Linux and HawkEye (Figures 2 and 4).
+2. CBMM does not regress application runtime, and under fragmentation can often significantly improve runtime compared to Linux and/or HawkEye (Figure 5).
+3. CBMM often uses huge pages more frugally than Linux or HawkEye despite getting better tail latency and comparable (or better) performance (Figure 6).
+4. CBMM has benefits even when profiles are imprecise (Section 5.5, 5.6).
+
+Because running all experiments is time and resource intensive, we provide a screencast and intermediate results for the reviewers. This should allow generation of checkable partial results in a reasonable amount of time. (TODO)
 
 ## Hardware and Software Requirements
 
@@ -102,7 +108,7 @@ NOTE: We include `cbmm-runner` and `cbmm` in this repository for archival reason
 
 5. At this point, we need to choose a kernel to install. For Linux/CBMM experiments, choose **Option A**. To setup a machine for HawkEye experiments, choose **Option B**. In the future, you can switch to the other configuration by just executing the command for the other option (you don't need to rerun the previous steps).
 
-   **Option A** Use the `runner` to install CBMM (our system) on the _test_ machine. This should take about ~1 hour. The command should produce lots of output about the commands being run and their output. The commands being run are on the _test_ machine (over SSH), not the _driver_.
+   **Option A: Linux/CBMM** Use the `runner` to install CBMM (our system) on the _test_ machine. This should take about ~1 hour. The command should produce lots of output about the commands being run and their output. The commands being run are on the _test_ machine (over SSH), not the _driver_.
 
    ```sh
    # Clones and builds the CBMM kernel at the given git commit hash.
@@ -114,7 +120,7 @@ NOTE: We include `cbmm-runner` and `cbmm` in this repository for archival reason
       +CONFIG_SLAB_FREELIST_RANDOM +CONFIG_SHUFFLE_PAGE_ALLOCATOR
    ```
 
-   **Option B** Use the `runner` to install HawkEye (experimental comparison) on the _test_ machine. This should take about ~1 hour. The command should produce lots of output about the commands being run and their output. The commands being run are on the _test_ machine (over SSH), not the _driver_.
+   **Option B: HawkEye** Use the `runner` to install HawkEye (experimental comparison) on the _test_ machine. This should take about ~1 hour. The command should produce lots of output about the commands being run and their output. The commands being run are on the _test_ machine (over SSH), not the _driver_.
 
    ```sh
    ./target/debug/runner setup00004 {MACHINE} {USER}
@@ -164,29 +170,32 @@ In each case, the _test_ machine will be reboot, will have a bunch of configurat
 
 We provide commands for generating the data in each of the figures in the paper and plotting them. All commands should be run on the _driver_ machine, not the _test_ machine.
 
-Generating all of the results is _very_ time consuming and resource intensive. The following table shows the time to run each workload (on our _test_ machine), as the reviewer may want to generate partial results from the paper in the interest of time.
+Generating all of the results is time and resource intensive (it took two of the authors two weeks on ~50 machines). In the paper, we run most experiments five times and use the median to reduce variance; we recommend the reviewers also do so.
 
-TODO: in the paper, we run each one 5x. Should we recommend reviewers do the same?
+The following table shows the time it took us to run a single experiment of each workload, as the reviewer may want to generate partial results from the paper in the interest of time.
+
 
 | Workload    | Rought time estimate |
 |-------------|----------------------|
-| xz          | 3 hours              |
-| mcf         | 20 minutes           |
 | canneal     | 4 hours              |
 | mongodb     | 4 hours              |
-| memcached   | 30 minutes           |
+| xz          | 3 hours              |
 | mix         | 1 hour               |
+| memcached   | 30 minutes           |
+| mcf         | 20 minutes           |
 | thp\_ubmk   | 10 minutes           |
 
-In the paper, Linux 5.5.8 is the comparison baseline, HawkEye is an additional comparison, and CBMM is our proposed system. Linux and CBMM experiments use the same kernel (Linux is CBMM with the CBMM-ish features disabled), while HawkEye uses a different kernel (from the authors of that paper). In the interest of the reviewer's time, we would recommend running Linux/CBMM experiments for multiple figures before switching configurations to run HawkEye experiments. This will reduce time spent switching between kernels.
+In the paper, Linux 5.5.8 is the comparison baseline, HawkEye is an additional comparison, and CBMM is our proposed system. Linux and CBMM experiments use the same kernel (Linux is CBMM with the CBMM-ish features disabled), while HawkEye uses a different kernel (from the authors of that paper).
+
+In the remainder of this document we give detailed instructions for generating results for each of our major claims and their corresponding figures, organized by figure. Commands explicitly labeled with **Linux/CBMM** should be run with the **Linux/CBMM** configuration; those labeled with **HawkEye** should be run with the **HawkEye** configuration; those not labeled can be run in either configuration. In the interest of the reviewer's time, we would recommend running Linux/CBMM experiments for multiple figures before switching configurations to run HawkEye experiments. This will reduce time spent switching between kernels (see step 5 of Getting Started for instructions to switch kernels).
 
 ### Figure 5
 
 ![Figure 5 from the paper.](figures/fig5.png)
 
-Start with Figure 5 because these results are used in some of the other figures too (e.g., to compute page fault rate). These experiments capture the total runtime of the workloads for each kernel and fragmentation setting. Note that you will need to run experiments with both kernel configurations (Linux/CBMM and HawkEye; see Getting Started, step 5).
+We start with Figure 5 because these results are used in some of the other figures too (e.g., to compute page fault rate). These experiments capture the total runtime of the workloads for each kernel and fragmentation setting. Note that you will need to run experiments with both kernel configurations (Linux/CBMM and HawkEye; see Getting Started, step 5).
 
-1. Run the experiments.
+1. Run the experiments. We recommend repeating this step five times, generating five sets of results, to reduce variance.
 
    **Linux/CBMM**
 
@@ -209,21 +218,20 @@ Start with Figure 5 because these results are used in some of the other figures 
    rsync -avzP {MACHINE}:~/vm_shared/ results/
    ```
 
-3. Process the output. For each experiment, we want to get the total runtime.
+3. Process the output. For each experiment, we want to get the total runtime (median of 5 runs). We found this easiest to do with a spreadsheet. We've provided a blank copy of our spreadsheet [here](TODO). Please refer to [this screencast](TODO) explaining how to use the spreadsheet and generate a CSV of the results for the next step.
 
-   For `xz`, `mcf`, `canneal`, TODO, the correct value can be found in the `$OUTPUT.runtime` file from the experiment's output.
+   For `xz`, `mcf`, `canneal`, `mix`, and `thp_ubmk`, the correct value can be found in the `$OUTPUT.runtime` file from the experiment's output.
 
    ```sh
    cat $OUTPUT.runtime
    ```
 
-   For `mongodb`, TODO, the correct value is the OVERALL Runtime:
+   For `mongodb` and `memcached` the correct value is the "[OVERALL] RunTime(ms)" reported by YCSB in `$OUTPUT.ycsb`:
 
    ```sh
-   cat $OUTPUT.runtime | grep OVERALL | grep RunTime | awk '{print $3}'
+   #           vvvv Note the extension -- .ycsb, not .runtime
+   cat $OUTPUT.ycsb | grep OVERALL | grep RunTime | awk '{print $3}'
    ```
-
-   TODO: generate the CSV
 
 4. Pass the CSV to the plotting script to produce Figure 5:
 
@@ -428,5 +436,9 @@ These experiments capture the amount of each workloads' memory usage covered by 
 4. TODO: scripts/plot-hp-efficiency.py
 
 ### Section 5.5
+
+TODO
+
+### Section 5.6
 
 TODO
