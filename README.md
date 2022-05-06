@@ -405,42 +405,113 @@ These experiments are similar to Figure 2. They collect the same data as Figure 
    rsync -avzP {MACHINE}:~/vm_shared/ $RESULTS_DIR
    ```
 
-3. Process the output to compute the page fault rate for each workload.
+3. Process the output to compute the page _count_ for each workload. We will use these to compute the page fault _rate_.
 
-   TODO: maybe want to provide a table here so they don't have to generate figure 5 first?
+   For each workload, let
+   - `$LINUX_RESULTS` be the results of the Linux experiment for this workload and fragmentation setting,
+   - `$HAWKEYE_RESULTS` be the results of the Hawkeye experiment ...
+   - `$CBMM_RESULTS` be the results of the CBMM experiment...
 
-   TODO
+   To get the page fault count for a particular workload, kernel, and fragmentation setting from the trace, use the following commands:
+
+   ```sh
+   # Linux
+   ./cbmm/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $LINUX_RESULTS.{pftrace,rejected} 10000 | sed 's/none(\([0-9]\+\)).*/\1/g'
+
+   # CBMM
+   ./cbmm/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $CBMM_RESULTS.{pftrace,rejected} 10000  | sed 's/none(\([0-9]\+\)).*/\1/g'
+
+   # HawkEye
+   FREQ=2600 ./scripts/bpf-pftrace-percentiles.py $HAWKEYE_RESULTS.pftrace 3846 10 | sed 's/none(\([0-9]\+\)).*/\1/g'
+   ```
+
+   We combine these counts with the total runtime (measured when generating Figure 5) to produce the page fault _rate_. We found this easiest to do with a spreadsheet. Please see [this screencast](TODO).
+
+   To allow the reviewer to generate plots without running all Figure 4 and 5 experiments, we provide the rates used in the paper in the following tables:
+
+   **Unfragmented**
+
+   Workload | Kernel | Page Fault Rate
+   ---------|--------|----------------
+   xz       | Linux  | TODO
+   memcached| Linux  | TODO
+   mcf      | Linux  | TODO
+   mongodb  | Linux  | TODO
+   canneal  | Linux  | TODO
+   mix      | Linux  | TODO
+   xz       | CBMM   | TODO
+   memcached| CBMM   | TODO
+   mcf      | CBMM   | TODO
+   mongodb  | CBMM   | TODO
+   canneal  | CBMM   | TODO
+   mix      | CBMM   | TODO
+   xz       | HawkEye| TODO
+   memcached| HawkEye| TODO
+   mcf      | HawkEye| TODO
+   mongodb  | HawkEye| TODO
+   canneal  | HawkEye| TODO
+   mix      | HawkEye| TODO
+
+   **Fragmented**
+
+   Workload | Kernel | Page Fault Rate
+   ---------|--------|----------------
+   xz       | Linux  | TODO
+   memcached| Linux  | TODO
+   mcf      | Linux  | TODO
+   mongodb  | Linux  | TODO
+   canneal  | Linux  | TODO
+   mix      | Linux  | TODO
+   xz       | CBMM   | TODO
+   memcached| CBMM   | TODO
+   mcf      | CBMM   | TODO
+   mongodb  | CBMM   | TODO
+   canneal  | CBMM   | TODO
+   mix      | CBMM   | TODO
+   xz       | HawkEye| TODO
+   memcached| HawkEye| TODO
+   mcf      | HawkEye| TODO
+   mongodb  | HawkEye| TODO
+   canneal  | HawkEye| TODO
+   mix      | HawkEye| TODO
 
 4. Process the output to generate plots. For each workload, let
-   - `$LINUX_RESULTS` be the results of the Linux experiment for this workload and fragmentation setting,
    - `$LINUX_SCALE` be the page fault rate in faults/second for this workload and fragmentation setting, as computed in the previous step,
-   - `$HAWKEYE_RESULTS` be the results of the Hawkeye experiment ...
-   - `$HAWKEYE_SCALE` be the page fault rate in faults/second,
-   - `$CBMM_RESULTS` be the results of the CBMM experiment...
-   - `$CBMM_SCALE` be the page fault rate in faults/second,
+   - `$HAWKEYE_SCALE` be the page fault rate in faults/second ...,
+   - `$CBMM_SCALE` be the page fault rate in faults/second ...,
 
    Then, we can produce the subplot of Figure 4 representing a particular workload and fragmentation setting as follows:
 
    ```sh
-   /nobackup/linux-mm-econ/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $LINUX_RESULTS.{pftrace,rejected} 10000 | sed 's|none([0-9]\+)|Linux|' > /tmp/tails.txt
-   /nobackup/linux-mm-econ/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $CBMM_RESULTS.{pftrace,rejected} 10000 | sed 's|none([0-9]\+)|CBMM|' >> /tmp/tails.txt
-   FREQ=2600 /nobackup/scripts/bpf-pftrace-percentiles.py $HAWKEYE_RESULTS.pftrace 3846 10 | sed 's|none([0-9]\+)|HawkEye|' >> /tmp/tails.txt
-   OUTFNAME=tails-mix PDF=1 FREQ=2200 SCALE="$LINUX_SCALE $CBMM_SCALE $HAWKEYE_SCALE" ./scripts/tail-cdf.py 10 $(cat /tmp/tails.txt)
-   ```
+   # Compute percentiles for each plot...
+   ./cbmm/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $LINUX_RESULTS.{pftrace,rejected} 10000 | sed 's|none([0-9]\+)|Linux|' > /tmp/tails.txt
+   ./cbmm/mm/read-pftrace/target/release/read-pftrace --tail 10 --combined --cli-only --exclude NOT_ANON --exclude SWAP --  $CBMM_RESULTS.{pftrace,rejected} 10000 | sed 's|none([0-9]\+)|CBMM|' >> /tmp/tails.txt
+   FREQ=2600 ./scripts/bpf-pftrace-percentiles.py $HAWKEYE_RESULTS.pftrace 3846 10 | sed 's|none([0-9]\+)|HawkEye|' >> /tmp/tails.txt
 
+   # Plot
+   OUTFNAME=tails-mix PDF=1 FREQ=2600 SCALE="$LINUX_SCALE $CBMM_SCALE $HAWKEYE_SCALE" ./scripts/tail-cdf.py 10 $(cat /tmp/tails.txt)
+   ```
 
 ### Figure 6
 
-TODO: split the experiments script to have separate HawkEye experiments because they need a different configuration! Also elsewhere...
+![Figure 6 from the paper](figures/fig6.png)
 
 These experiments capture the amount of each workloads' memory usage covered by huge pages for each kernel and fragmentation setting.
 
 1. Run the experiments.
 
+   **Linux/CBMM**
+
    ```sh
    cd cbmm-runner/runner
-   ./scripts/figure-6.sh
+   ../../scripts/figure-6-linux-cbmm.sh
    ```
+
+   **HawkEye**
+
+   ```sh
+   cd cbmm-runner/runner
+   ../../scripts/figure-6-hawkeye.sh
 
 2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
@@ -448,9 +519,19 @@ These experiments capture the amount of each workloads' memory usage covered by 
    rsync -avzP {MACHINE}:~/vm_shared/ $RESULTS_DIR
    ```
 
-3.  Process the output... TODO
+3. Process the output to get the percentage of memory mapped with huge pages for each workload, kernel, and fragmentation setting:
 
-4. TODO: scripts/plot-hp-efficiency.py
+   ```sh
+   cat $OUTPUT.smaps | ./scripts/smaps-efficiency.py
+   ```
+
+   Once again, we use a spreadsheet to store results and generate a CSV. Please see [this screencast](TODO).
+
+4. Plot the results using the CSV:
+
+   ```sh
+   ./scripts/plot-hp-efficiency.py /path/to/downloaded.csv
+   ```
 
 ### Section 5.5
 
