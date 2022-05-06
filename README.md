@@ -50,6 +50,8 @@ _Test_ machine:
    - We will install the CBMM kernel in the instructions below.
 - Needs to have internet access to download software packages through `yum`, `git`, `wget`, `curl`.
 
+----
+
 ## Getting Started
 
 We will clone and build the `runner` program on the _driver_ machine. The `runner` will then be used to set up the _test_ machine as needed. The `runner` can subsequently be used to run any experiments in the paper.
@@ -169,14 +171,15 @@ In each case, the _test_ machine will be reboot, will have a bunch of configurat
       memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
    ```
 
+----
+
 ## Detailed Instructions
 
 We provide commands for generating the data in each of the figures in the paper and plotting them. All commands should be run on the _driver_ machine, not the _test_ machine.
 
-Generating all of the results is time and resource intensive (it took two of the authors two weeks on ~50 machines). In the paper, we run most experiments five times and use the median to reduce variance; we recommend the reviewers also do so.
+In the paper, we run most experiments five times and use the median to reduce variance; we recommend the reviewers also do so.
 
-The following table shows the time it took us to run a single experiment of each workload, as the reviewer may want to generate partial results from the paper in the interest of time.
-
+Generating all of the results is time and resource intensive (it took two of the authors two weeks on ~50 machines). The following table shows the time it took us to run a single experiment of each workload. The reviewer may want to generate partial results from the paper in the interest of time.
 
 | Workload    | Rought time estimate |
 |-------------|----------------------|
@@ -337,6 +340,9 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
 
 ### Figure 2
 
+<img src="fig2-lgd.png" alt="Legend of Figure 2" />
+<img src="fig2a.png" alt="Figure 2a (canneal)" height="200" /> <img src="fig2b.png" alt="Figure 2b (memcached)" height="200" /> <img src="fig2c.png" alt="Figure 2c (mongodb)" height="200" /> <img src="fig2d.png" alt="Figure 2d (dc-mix)" height="200" />
+
 These experiments measure page fault latency on Linux (v5.5.8) for each of the workloads we measured.
 
 1. Run the experiments.
@@ -364,6 +370,9 @@ These experiments measure page fault latency on Linux (v5.5.8) for each of the w
    ```
 
 ### Figure 4
+
+<img src="figures/fig4-lgd.png" alt="Legend of Figure 4" />
+<img src="figures/fig4a.png" alt="Figure 4a (mcf)" height="200" /> <img src="figures/fig4b.png" alt="Figure 4b (xz)" height="200" /> <img src="figures/fig4c.png" alt="Figure 4c (canneal)" height="200" /> <img src="figures/fig4d.png" alt="Figure 4d (memcached)" height="200" /> <img src="figures/fig4e.png" alt="Figure 4e (mongodb)" height="200" /> <img src="figures/fig4f.png" alt="Figure 4f (dc-mix)" height="200" />
 
 These experiments are similar to Figure 2. They collect the same data as Figure 2, but on HawkEye and CBMM, too. Additionally, we will process them differently to generate different plots. Note that you will need to run experiments with both kernel configurations (Linux/CBMM and HawkEye; see Getting Started, step 5).
 
