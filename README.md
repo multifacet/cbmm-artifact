@@ -22,7 +22,7 @@ The CBMM kernel runs on the _test_ machine, while the `runner` program runs on t
 
 Running the experiments as specified below on similar hardware to our own setup (described in Section 5.1) should allow the reviewer to generate comparable results to those in the accepted version of the paper, including tail latency, performance, huge page usage, and generality results.
 
-TODO: Because that is extremely time consuming, we provide a screencast and intermediate results for the reviewers. This should allow generation of checkable partial results in a reasonable amount of time.
+Because that is extremely time consuming, we provide a screencast and intermediate results for the reviewers. This should allow generation of checkable partial results in a reasonable amount of time. (TODO)
 
 ## Hardware and Software Requirements
 
@@ -166,6 +166,8 @@ We provide commands for generating the data in each of the figures in the paper 
 
 Generating all of the results is _very_ time consuming and resource intensive. The following table shows the time to run each workload (on our _test_ machine), as the reviewer may want to generate partial results from the paper in the interest of time.
 
+TODO: in the paper, we run each one 5x. Should we recommend reviewers do the same?
+
 | Workload    | Rought time estimate |
 |-------------|----------------------|
 | xz          | 3 hours              |
@@ -176,11 +178,11 @@ Generating all of the results is _very_ time consuming and resource intensive. T
 | mix         | 1 hour               |
 | thp\_ubmk   | 10 minutes           |
 
-Also in the interest of the reviewer's time, we would recommend running Linux/CBMM experiments for multiple figures before switching configurations to run HawkEye experiments. This will reduce time spent switching between kernels.
+In the paper, Linux 5.5.8 is the comparison baseline, HawkEye is an additional comparison, and CBMM is our proposed system. Linux and CBMM experiments use the same kernel (Linux is CBMM with the CBMM-ish features disabled), while HawkEye uses a different kernel (from the authors of that paper). In the interest of the reviewer's time, we would recommend running Linux/CBMM experiments for multiple figures before switching configurations to run HawkEye experiments. This will reduce time spent switching between kernels.
 
 ### Figure 5
 
-TODO: in the paper, we run each one 5x. Should we recommend reviewers do the same?
+![Figure 5 from the paper.](fig5.png)
 
 Start with Figure 5 because these results are used in some of the other figures too (e.g., to compute page fault rate). These experiments capture the total runtime of the workloads for each kernel and fragmentation setting. Note that you will need to run experiments with both kernel configurations (Linux/CBMM and HawkEye; see Getting Started, step 5).
 
