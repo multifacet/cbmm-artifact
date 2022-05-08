@@ -29,13 +29,13 @@ Specifically, our paper's key claims are:
 3. CBMM often uses huge pages more frugally than Linux or HawkEye despite getting better tail latency and comparable (or better) performance (Figure 6).
 4. CBMM has benefits even when profiles are imprecise (Section 5.5, 5.6).
 
-Because running all experiments is time and resource intensive, we provide a screencast and intermediate results for the reviewers. This should allow generation of checkable partial results in a reasonable amount of time. (TODO)
+Because running all experiments is time and resource intensive, we provide a screencast and intermediate results for the reviewers. This should allow generation of checkable partial results in a reasonable amount of time.
 
 ## Hardware and Software Requirements
 
 _Driver_ machine:
 - A recent Linux distro with standard utilities. We ran extensively on Ubuntu 18.04 and Ubuntu 20.04.
-- [Rust](https://rust-lang.org) 1.31 or greater. The `runner` is written in rust.
+- [Rust](https://www.rust-lang.org/tools/install) 1.31 or greater. The `runner` is written in rust.
 - Needs to have _passwordless_ SSH access to the _test_ machine. This is used for automatedly running commands for the experiments.
    - The network needs to be _stable_ for long periods of time, as the SSH connection is maintained while long-running commands run.
 - No significant memory, CPU, or disk requirements...
@@ -225,7 +225,7 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
    rsync -avzP {MACHINE}:~/vm_shared/ $RESULTS_DIR
    ```
 
-3. Process the output. For each experiment, we want to get the total runtime (median of 5 runs). We found this easiest to do with a spreadsheet. We've provided a blank copy of our spreadsheet [here](TODO). Please refer to [this screencast](TODO) explaining how to use the spreadsheet and generate a CSV of the results for the next step.
+3. Process the output. For each experiment, we want to get the total runtime (median of 5 runs). We found this easiest to do with a spreadsheet. We've provided a blank copy of our spreadsheet [here](https://docs.google.com/spreadsheets/d/1KA-ybuvdKClV0VWzlaM6qtJjsZVQMIn2BHZ642A_vUY/edit?usp=sharing). Please refer to [this screencast](https://youtu.be/RpBI6XHbVVA) explaining how to use the spreadsheet and generate a CSV of the results for the next step.
 
    For `xz`, `mcf`, `canneal`, `mix`, and `thp_ubmk`, the correct value can be found in the `$OUTPUT.runtime` file from the experiment's output.
 
@@ -239,6 +239,8 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
    #           vvvv Note the extension -- .ycsb, not .runtime
    cat $OUTPUT.ycsb | grep OVERALL | grep RunTime | awk '{print $3}'
    ```
+
+   TODO: include our copy of the CSV in the repo (also elsewhere)
 
 4. Pass the CSV to the plotting script to produce Figure 5:
 
