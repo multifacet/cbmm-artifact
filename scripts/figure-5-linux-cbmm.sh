@@ -46,3 +46,15 @@ USER=$2
 ./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/memcached.csv memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
 ./target/debug/runner exp00012 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefits redis-server ./profiles/mix-redis.csv mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
 ./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/thp-ubmk.csv thp_ubmk 150
+
+# **CBMM, without fragmentation** TUNED
+
+./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mcf-tuned.csv hacky_spec17 mcf
+./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file ./profiles/canneal-tuned.csv canneal --rand 530000000
+./target/debug/runner exp00012 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefits redis-server ./profiles/mix-tuned.csv mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
+
+# **CBMM, with fragmentation** TUNED
+
+./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/mcf-tuned.csv hacky_spec17 mcf
+./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file ./profiles/canneal-tuned.csv canneal --rand 530000000
+./target/debug/runner exp00012 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefits redis-server ./profiles/mix-tuned.csv mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25

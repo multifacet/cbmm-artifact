@@ -575,7 +575,65 @@ These experiments capture the amount of each workloads' memory usage covered by 
 
 ### Section 5.5
 
-TODO
+The results in this section show that CBMM has benefits even when a profile is highly imprecise. We do this by generating and evaluating greatly simplified profiles and using them with CBMM.
+
+These experiments use the same command but different profiles. For each `$PROFILE`, run the following:
+
+```sh
+# xz unfragmented and fragmented
+./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file $PROFILE hacky_spec17 xz --spec_size 76800 --input  testing
+./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file $PROFILE hacky_spec17 xz --spec_size 76800 --input  testing
+
+# mcf
+./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file $PROFILE hacky_spec17 mcf
+./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file $PROFILE hacky_spec17 mcf
+
+# canneal
+./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file $PROFILE canneal --rand 530000000
+./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file $PROFILE canneal --rand 530000000
+
+# mongodb
+./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file $PROFILE mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
+./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file $PROFILE mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
+
+# memcached
+./target/debug/runner exp00010 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefit_file $PROFILE memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
+./target/debug/runner exp00010 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefit_file $PROFILE memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
+
+# mix
+./target/debug/runner exp00012 {MACHINE} {USER}   --asynczero --mm_econ --mm_econ_benefits redis-server $PROFILE mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
+./target/debug/runner exp00012 {MACHINE} {USER}  --fragmentation 100 --asynczero --mm_econ --mm_econ_benefits redis-server $PROFILE mixycsb 150 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
+```
+
+Here are the profiles we used, generated as specified in Section 5.5:
+
+Workload | Profile | Link
+---------|---------|-------
+xz       | standard| [Link](./profiles/xz-training.csv)
+xz       | perapp  | [Link](./profiles/xz-training-perapp.csv)
+xz       | general | [Link](./profiles/general.csv)
+---------|---------|-------
+mcf      | standard| [Link](./profiles/mcf.csv)
+mcf      | perapp  | [Link](./profiles/mcf-perapp.csv)
+mcf      | general | [Link](./profiles/general.csv)
+---------|---------|-------
+canneal  | standard| [Link](./profiles/canneal.csv)
+canneal  | perapp  | [Link](./profiles/canneal-perapp.csv)
+canneal  | general | [Link](./profiles/general.csv)
+---------|---------|-------
+mongodb  | standard| [Link](./profiles/mongodb.csv)
+mongodb  | perapp  | Same as standard (see Section 4.1)
+mongodb  | general | [Link](./profiles/general.csv)
+---------|---------|-------
+memcached| standard| [Link](./profiles/memcached.csv)
+memcached| perapp  | Same as standard (see Section 4.1)
+memcached| general | [Link](./profiles/general.csv)
+---------|---------|-------
+mix      | standard| [Link](./profiles/mix-redis.csv)
+mix      | perapp  | Same as standard (see Section 4.1)
+mix      | general | [Link](./profiles/general.csv)
+
+As with Figure 5, the runtime of the workload is reported in the `$OUTPUT.runtime` file of the experimental output.
 
 ### Section 5.6
 
