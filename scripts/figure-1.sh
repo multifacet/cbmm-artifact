@@ -1,8 +1,7 @@
-#!/bin/bash
+#!/usr/bin/false
 
-if [ "$#" -ne 2 ]; then
-    echo "USAGE: ./figure-1.sh MACHINE USER"
-fi
+echo "DON'T ACTUALLY EXECUTE THIS FILE WITHOUT EDITING {MACHINE} AND {USER} AND SETTING jobserver UP PROPERLY."
+exit 1
 
 MACHINE=$1
 USER=$2
@@ -15,6 +14,16 @@ USER=$2
 ./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
 ./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   redisycsb 50 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
 ./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   thp_ubmk 150
+
+# Capture page usage (eager paging profiling)
+
+./target/debug/runner exp00010 {MACHINE} {USER} --eagerprofile 60   hacky_spec17 xz --spec_size 76800 --input  training
+./target/debug/runner exp00010 {MACHINE} {USER} --eagerprofile 60   hacky_spec17 mcf
+./target/debug/runner exp00010 {MACHINE} {USER} --eagerprofile 60   canneal --rand 530000000
+./target/debug/runner exp00010 {MACHINE} {USER} --eagerprofile 60   mongodb --op_count 9500000 --read_prop 0.25 --update_prop 0.375
+./target/debug/runner exp00010 {MACHINE} {USER} --eagerprofile 60   memcachedycsb 150 --op_count 9400000 --read_prop 0.99 --update_prop 0.01
+./target/debug/runner exp00010 {MACHINE} {USER} --eagerprofile 60   redisycsb 50 --op_count 9400000 --read_prop 0.50 --update_prop 0.25
+./target/debug/runner exp00010 {MACHINE} {USER} --eagerprofile 60   thp_ubmk 150
 
 # PROCESS SMAPS THEN PROCEED...
 
