@@ -195,6 +195,18 @@ In the paper, Linux 5.5.8 is the comparison baseline, HawkEye is an additional c
 
 In the remainder of this document we give detailed instructions for generating results for each of our major claims and their corresponding figures, organized by figure. Commands explicitly labeled with **Linux/CBMM** should be run with the **Linux/CBMM** configuration; those labeled with **HawkEye** should be run with the **HawkEye** configuration; those not labeled can be run in either configuration. In the interest of the reviewer's time, we would recommend running Linux/CBMM experiments for multiple figures before switching configurations to run HawkEye experiments. This will reduce time spent switching between kernels (see step 5 of Getting Started for instructions to switch kernels).
 
+**A helpful tool**
+
+In running the thousands of experiments for this paper, we found it useful to track all experiments in a spreadsheet.
+- Column C was used by the co-authors to coordinate who would run which experiments.
+- Column N contains the command to run (used with `runner` or `jobserver`).
+- Columns O through T were used to contain paths to the results files in the shared file system.
+- Column L contains the path to the CBMM profile for any given experiment. You should adjust these to use the correct paths for your system.
+
+[Here is a copy of our actual spreadsheet](https://docs.google.com/spreadsheets/d/1mXJLroZRKoiKONVOOzkDTG6UJzaFNdfwcgSNjQBhbss/edit?usp=sharing).
+
+[Here is a blank copy you can clone (File > Make a Copy)](https://docs.google.com/spreadsheets/d/11JjMGuVHG77WUdK5TLNWLs48K6ZxxFgDt_c5UrLQASA/edit?usp=sharing) and use yourself if you would like.
+
 ### Figure 5
 
 ![Figure 5 from the paper.](figures/fig5.png)
