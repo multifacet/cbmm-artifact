@@ -637,4 +637,6 @@ As with Figure 5, the runtime of the workload is reported in the `$OUTPUT.runtim
 
 ### Section 5.6
 
-TODO
+In this section, we explore the impact of different models in CBMM by rerunning the experiments of Figures 2, 4, and 5 with parts of our CBMM prototype turned off.
+
+The commands to run the experiments are in `./scripts/section-5.6.sh`. The results can be plotted using the same steps as Figures 2, 4, and 5, documented above.
