@@ -1,5 +1,7 @@
 # Artifact package for CBMM paper (ATC'22)
 
+[**THIS README IS BEST VIEWED ON GITHUB**](https://github.com/multifacet/cbmm-artifact/blob/main/README.md)
+
 ## Overview
 
 This artifact contains:
