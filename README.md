@@ -240,7 +240,7 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
    cat $OUTPUT.ycsb | grep OVERALL | grep RunTime | awk '{print $3}'
    ```
 
-   TODO: include our copy of the CSV in the repo (also elsewhere)
+   We include our data as [figures/fig5.csv](./figures/fig5.csv).
 
 4. Pass the CSV to the plotting script to produce Figure 5:
 
@@ -338,6 +338,18 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
 
 8. We then imported the CSV to spreadsheet software and used it to produce plots and statistics. Please see [the aforementioned screencast](TODO).
 
+   We include our data in the following CSVs (these are the exported contents of the first tab in each spreadsheet, which you can upload into your own clone of our template.
+
+   Workload | CSV
+   ---------|--------
+   xz       | [Link](./figures/fig1-xz.csv)
+   memcached| [Link](./figures/fig1-memcached.csv)
+   mcf      | [Link](./figures/fig1-mcf.csv)
+   mongodb  | [Link](./figures/fig1-mongodb.csv)
+   canneal  | [Link](./figures/fig1-canneal.csv)
+   mix      | [Link](./figures/fig1-mix.csv)
+
+
 [`jobserver`]: https://github.com/mark-i-m/jobserver
 
 ### Figure 2
@@ -427,7 +439,7 @@ These experiments are similar to Figure 2. They collect the same data as Figure 
    FREQ=2600 ./scripts/bpf-pftrace-percentiles.py $HAWKEYE_RESULTS.pftrace 3846 10 | sed 's/none(\([0-9]\+\)).*/\1/g'
    ```
 
-   We combine these counts with the total runtime (measured when generating Figure 5) to produce the page fault _rate_. We found this easiest to do with a spreadsheet. Please see [this screencast](TODO).
+   We can now compute the page fault _rate_ as (_page fault count_) / (_workload runtime_), where the count comes from the above commands, and the runtime comes from the Figure 5 results.
 
    To allow the reviewer to generate plots without running all Figure 4 and 5 experiments, we provide the rates used in the paper in the following tables:
 
@@ -532,6 +544,8 @@ These experiments capture the amount of each workloads' memory usage covered by 
    ```
 
    Once again, we use a spreadsheet to store results and generate a CSV. Please see [this screencast](TODO).
+
+   We include our data as [figures/fig6.csv](./figures/fig6.csv).
 
 4. Plot the results using the CSV:
 
