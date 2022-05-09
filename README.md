@@ -559,9 +559,13 @@ These experiments capture the amount of each workloads' memory usage covered by 
    cat $OUTPUT.smaps | ./scripts/smaps-efficiency.py
    ```
 
-   Once again, we use a spreadsheet to store results and generate a CSV. Please see [this screencast](TODO).
+   Once again, we generate a CSV. The columns are as follows:
 
-   We include our data as [figures/fig6.csv](./figures/fig6.csv).
+   ```csv
+   workload,kernel,fragmentation,smaps file,Efficiency
+   ```
+
+   We include our CSV as [figures/fig6.csv](./figures/fig6.csv).
 
 4. Plot the results using the CSV:
 
