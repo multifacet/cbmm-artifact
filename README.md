@@ -260,7 +260,7 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
    ./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   hacky_spec17 xz --spec_size 76800 --input  training
    ```
 
-2. Profile the workloads for each paging. For example, for `xz`:
+2. Profile the workloads for eager paging. For example, for `xz`:
 
    ```sh
    ./target/debug/runner exp00010 {MACHINE} {USER} --eagerprofile 60   hacky_spec17 xz --spec_size 76800 --input  training
@@ -344,7 +344,9 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
 
 9. We then imported the CSV to spreadsheet software and used it to produce plots and statistics. Please see [the aforementioned screencast][fig1sc].
 
-   We include our data in the following CSVs (these are the exported contents of the first tab in each spreadsheet, which you can upload into your own clone of our template.
+   [Here is a template](https://docs.google.com/spreadsheets/d/1KjVAH_flvBbhQdzR9HDoIr242VkaB7uE1z6BvItZAoA/edit?usp=sharing) which you can clone to follow along with the screencast.
+
+   We include our data in the following CSVs. These can be imported directly into the `Data` sheet of the aforementioned spreadsheet (no need to do the cleanup mentioned in the screencast):
 
    Workload | CSV
    ---------|--------
@@ -364,7 +366,7 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
    where `$HPFILE.csv` is the downloaded contents of the spreadsheet's `Per-page-benefits` tab, and `$OUTPUT.eagerprofile` is the file from the output of the eager profiling experiments run in step 2. The output file is `xz-profile.csv`, which can be passed to CBMM as a profile.
 
 [`jobserver`]: https://github.com/mark-i-m/jobserver
-[fig1sc]: TODO
+[fig1sc]: https://youtu.be/oT4_nvhhZQc
 
 ### Figure 2
 
