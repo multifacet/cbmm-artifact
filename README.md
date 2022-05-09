@@ -225,7 +225,7 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
    rsync -avzP {MACHINE}:~/vm_shared/ $RESULTS_DIR
    ```
 
-3. Process the output. For each experiment, we want to get the total runtime (median of 5 runs). We found this easiest to do with a spreadsheet. We've provided a blank copy of our spreadsheet [here](https://docs.google.com/spreadsheets/d/1KA-ybuvdKClV0VWzlaM6qtJjsZVQMIn2BHZ642A_vUY/edit?usp=sharing). Please refer to [this screencast](https://youtu.be/RpBI6XHbVVA) explaining how to use the spreadsheet and generate a CSV of the results for the next step.
+3. Process the output. For each experiment, we want to get the total runtime (median of 5 runs). We found this easiest to do with a spreadsheet. We've provided a blank copy of our spreadsheet [here for you to clone (File > Make a Copy)](https://docs.google.com/spreadsheets/d/1KA-ybuvdKClV0VWzlaM6qtJjsZVQMIn2BHZ642A_vUY/edit?usp=sharing). Please refer to [this screencast](https://youtu.be/RpBI6XHbVVA) explaining how to use the spreadsheet and generate a CSV of the results for the next step.
 
    For `xz`, `mcf`, `canneal`, `mix`, and `thp_ubmk`, the correct value can be found in the `$OUTPUT.runtime` file from the experiment's output.
 
@@ -252,7 +252,7 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
 
 <img src="figures/fig1a.png" alt="Figure 1a from the paper (xz)." height="200" /> <img src="figures/fig1b.png" alt="Figure 1b from the paper (canneal)." height="200" /> <img src="figures/fig1c.png" alt="Figure 1c from the paper (memcached)." height="200" /> <img src="figures/fig1d.png" alt="Figure 1d from the paper (mongodb)." height="200" />
 
-This figure contains the results of ~4000 experiments. Please see [this screencast](TODO) for our procedure to generate these results. The high-level procedure and rationale are described in Section 2.1 of the paper. We give only examples here for brevity, but the full set of commands to run experiments is included in `./scripts/figure-1.sh`. (TODO) We include the commands for completeness, but we also include the final results (the profiles) in `profiles/`, for your use in the remaining experiments.
+This figure contains the results of ~4000 experiments. Please see [this screencast](TODO) for our procedure to generate these results. The high-level procedure and rationale are described in Section 2.1 of the paper. We give only examples here for brevity, but the full set of commands to run experiments is included in `./scripts/figure-1.sh`. We include the commands for completeness, but we also include the final results (the profiles) in `profiles/`, for your use in the remaining experiments.
 
 1. Collect `/proc/[pid]/smaps` for each workload. This gives the address space layout for the profiled process. For example, for `xz`:
 
