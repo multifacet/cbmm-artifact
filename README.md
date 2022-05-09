@@ -252,7 +252,7 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
 
 <img src="figures/fig1a.png" alt="Figure 1a from the paper (xz)." height="200" /> <img src="figures/fig1b.png" alt="Figure 1b from the paper (canneal)." height="200" /> <img src="figures/fig1c.png" alt="Figure 1c from the paper (memcached)." height="200" /> <img src="figures/fig1d.png" alt="Figure 1d from the paper (mongodb)." height="200" />
 
-This figure contains the results of ~4000 experiments. Please see [this screencast](TODO) for our procedure to generate these results. The high-level procedure and rationale are described in Section 2.1 of the paper. We give only examples here for brevity, but the full set of commands to run experiments is included in `./scripts/figure-1.sh`. We include the commands for completeness, but we also include the final results (the profiles) in `profiles/`, for your use in the remaining experiments.
+This figure contains the results of ~4000 experiments. Please see [this screencast][fig1sc] for our procedure to generate these results. The high-level procedure and rationale are described in Section 2.1 of the paper. We give only examples here for brevity, but the full set of commands to run experiments is included in `./scripts/figure-1.sh`. We include the commands for completeness, but we also include the final results (the profiles) in `profiles/`, for your use in the remaining experiments.
 
 1. Collect `/proc/[pid]/smaps` for each workload. This gives the address space layout for the profiled process. For example, for `xz`:
 
@@ -260,13 +260,19 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
    ./target/debug/runner exp00010 {MACHINE} {USER} --smaps_periodic   hacky_spec17 xz --spec_size 76800 --input  training
    ```
 
-2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
+2. Profile the workloads for each paging. For example, for `xz`:
+
+   ```sh
+   ./target/debug/runner exp00010 {MACHINE} {USER} --eagerprofile 60   hacky_spec17 xz --spec_size 76800 --input  training
+   ```
+
+3. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
    ```sh
    rsync -avzP {MACHINE}:~/vm_shared/ $RESULTS_DIR
    ```
 
-3. Process the smaps output and split the address space into 100 equally-sized chunks.
+4. Process the smaps output and split the address space into 100 equally-sized chunks.
 
    ```sh
    cat $RESULTS_DIR/$OUTPUT.smaps | ./scripts/process-smaps.py
@@ -303,7 +309,7 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
 
    These are the address space slices we will use for our profiling.
 
-4. For each `<start> <end>,...` in the list above, run the following command (we ran each command 5x to reduce variability):
+5. For each `<start> <end>,...` in the list above, run the following command (we ran each command 5x to reduce variability):
 
    ```sh
    ./target/debug/runner exp00010 {MACHINE} {USER}  --thp_huge_addr_ranges {ADDR} \
@@ -318,25 +324,25 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
    j job matrix add -x 5 --timeout 600 --max_failures 5 exp-c220g5 "exp00010 {MACHINE} {USER}  --thp_huge_addr_ranges {ADDR} --end  --mmu_overhead    hacky_spec17 xz --spec_size 76800 --input  training" $RESULTS_DIR "ADDR=0x0 0x7fcc76400000,0x7fcc76400000 0x7fccfcc00000,0x7fccfcc00000 0x7fcd83400000,0x7fcd83400000 0x7fce09c00000,0x7fce09c00000 0x7fce90400000,0x7fce90400000 0x7fcf16c00000,0x7fcf16c00000 0x7fcf9d400000,0x7fcf9d400000 0x7fd023c00000,0x7fd023c00000 0x7fd0aa400000,0x7fd0aa400000 0x7fd130c00000,0x7fd130c00000 0x7fd1b7400000,0x7fd1b7400000 0x7fd23dc00000,0x7fd23dc00000 0x7fd2c4400000,0x7fd2c4400000 0x7fd34ac00000,0x7fd34ac00000 0x7fd3d1400000,0x7fd3d1400000 0x7fd457c00000,0x7fd457c00000 0x7fd4de400000,0x7fd4de400000 0x7fd564c00000,0x7fd564c00000 0x7fd5eb400000,0x7fd5eb400000 0x7fd671c00000,0x7fd671c00000 0x7fd6f8400000,0x7fd6f8400000 0x7fd77ec00000,0x7fd77ec00000 0x7fd805400000,0x7fd805400000 0x7fd88bc00000,0x7fd88bc00000 0x7fd912400000,0x7fd912400000 0x7fd998c00000,0x7fd998c00000 0x7fda1f400000,0x7fda1f400000 0x7fdaa5c00000,0x7fdaa5c00000 0x7fdb2c400000,0x7fdb2c400000 0x7fdbb2c00000,0x7fdbb2c00000 0x7fdc39400000,0x7fdc39400000 0x7fdcbfc00000,0x7fdcbfc00000 0x7fdd46400000,0x7fdd46400000 0x7fddccc00000,0x7fddccc00000 0x7fde53400000,0x7fde53400000 0x7fded9c00000,0x7fded9c00000 0x7fdf60400000,0x7fdf60400000 0x7fdfe6c00000,0x7fdfe6c00000 0x7fe06d400000,0x7fe06d400000 0x7fe0f3c00000,0x7fe0f3c00000 0x7fe17a400000,0x7fe17a400000 0x7fe200c00000,0x7fe200c00000 0x7fe287400000,0x7fe287400000 0x7fe30dc00000,0x7fe30dc00000 0x7fe394400000,0x7fe394400000 0x7fe41ac00000,0x7fe41ac00000 0x7fe4a1400000,0x7fe4a1400000 0x7fe527c00000,0x7fe527c00000 0x7fe5ae400000,0x7fe5ae400000 0x7fe634c00000,0x7fe634c00000 0x7fe6bb400000,0x7fe6bb400000 0x7fe741c00000,0x7fe741c00000 0x7fe7c8400000,0x7fe7c8400000 0x7fe84ec00000,0x7fe84ec00000 0x7fe8d5400000,0x7fe8d5400000 0x7fe95bc00000,0x7fe95bc00000 0x7fe9e2400000,0x7fe9e2400000 0x7fea68c00000,0x7fea68c00000 0x7feaef400000,0x7feaef400000 0x7feb75c00000,0x7feb75c00000 0x7febfc400000,0x7febfc400000 0x7fec82c00000,0x7fec82c00000 0x7fed09400000,0x7fed09400000 0x7fed8fc00000,0x7fed8fc00000 0x7fee16400000,0x7fee16400000 0x7fee9cc00000,0x7fee9cc00000 0x7fef23400000,0x7fef23400000 0x7fefa9c00000,0x7fefa9c00000 0x7ff030400000,0x7ff030400000 0x7ff0b6c00000,0x7ff0b6c00000 0x7ff13d400000,0x7ff13d400000 0x7ff1c3c00000,0x7ff1c3c00000 0x7ff24a400000,0x7ff24a400000 0x7ff2d0c00000,0x7ff2d0c00000 0x7ff357400000,0x7ff357400000 0x7ff3ddc00000,0x7ff3ddc00000 0x7ff464400000,0x7ff464400000 0x7ff4eac00000,0x7ff4eac00000 0x7ff571400000,0x7ff571400000 0x7ff5f7c00000,0x7ff5f7c00000 0x7ff67e400000,0x7ff67e400000 0x7ff704c00000,0x7ff704c00000 0x7ff78b400000,0x7ff78b400000 0x7ff811c00000,0x7ff811c00000 0x7ff898400000,0x7ff898400000 0x7ff91ec00000,0x7ff91ec00000 0x7ff9a5400000,0x7ff9a5400000 0x7ffa2bc00000,0x7ffa2bc00000 0x7ffab2400000,0x7ffab2400000 0x7ffb38c00000,0x7ffb38c00000 0x7ffbbf400000,0x7ffbbf400000 0x7ffc45c00000,0x7ffc45c00000 0x7ffccc400000,0x7ffccc400000 0x7ffd52c00000,0x7ffd52c00000 0x7ffdd9400000,0x7ffdd9400000 0x7ffe5fc00000,0x7ffe5fc00000 0x7ffee6400000,0x7ffee6400000 0x7fff6cc00000,0x7fff6cc00000 0x7ffff3400000,0x7ffff3400000 0x800079c00000"
    ```
 
-5. For each output file from the experiments above, run `./scripts/extract-ranges3.py` to extract the data from the experiment output. The data will be a collection of metadata and performance counters. We once again used [`jobserver`] to help with this:
+6. For each output file from the experiments above, run `./scripts/extract-ranges3.py` to extract the data from the experiment output. The data will be a collection of metadata and performance counters. We once again used [`jobserver`] to help with this:
 
    ```sh
-   j job stat --only_done --results_path mmu --cmd --csv --jid --mapper /nobackup/scripts/extract-ranges3.py --id $MATRIX_ID_FROM_PREVIOUS_CMD > /tmp/data.csv
+   j job stat --only_done --results_path mmu --cmd --csv --jid --mapper ./scripts/extract-ranges3.py --id $MATRIX_ID_FROM_PREVIOUS_CMD > /tmp/data.csv
    ```
 
-6. We also want to run the control experiments (no huge pages and Linux THP):
+7. We also want to run the control experiments (no huge pages and Linux THP):
 
    ```sh
    j job matrix add -x 5 --timeout 600 --max_failures 5 exp-c220g5 "exp00010 {MACHINE} {USER}  {THP}  --mmu_overhead    hacky_spec17 xz --spec_size 76800 --input  training" $RESULTS_DIR "THP=,--disable_thp"
    ```
 
-7. As with the range experiments, we want to extract the data form the experimental output as a CSV:
+8. As with the range experiments, we want to extract the data form the experimental output as a CSV using the `./scripts/extract3.py` script:
 
    ```sh
-   j job stat --only_done --results_path mmu --cmd --csv --jid --mapper /nobackup/scripts/extract3.py --id $MATRIX_ID_FROM_PREVIOUS_CMD > /tmp/data-nt.csv
+   j job stat --only_done --results_path mmu --cmd --csv --jid --mapper ./scripts/extract3.py --id $MATRIX_ID_FROM_PREVIOUS_CMD > /tmp/data-nt.csv
    ```
 
-8. We then imported the CSV to spreadsheet software and used it to produce plots and statistics. Please see [the aforementioned screencast](TODO).
+9. We then imported the CSV to spreadsheet software and used it to produce plots and statistics. Please see [the aforementioned screencast][fig1sc].
 
    We include our data in the following CSVs (these are the exported contents of the first tab in each spreadsheet, which you can upload into your own clone of our template.
 
@@ -349,8 +355,16 @@ This figure contains the results of ~4000 experiments. Please see [this screenca
    canneal  | [Link](./figures/fig1-canneal.csv)
    mix      | [Link](./figures/fig1-mix.csv)
 
+10. Finally, we want to use this data to generate the profiles for CBMM. For each workload, we want to combine the profiling information for huge page benefits and eager paging. For example, for `xz`:
+
+   ```sh
+   ./scripts/generate-profile2.py $HPFILE.csv $OUTPUT.eagerprofile xz-profile.csv
+   ```
+
+   where `$HPFILE.csv` is the downloaded contents of the spreadsheet's `Per-page-benefits` tab, and `$OUTPUT.eagerprofile` is the file from the output of the eager profiling experiments run in step 2. The output file is `xz-profile.csv`, which can be passed to CBMM as a profile.
 
 [`jobserver`]: https://github.com/mark-i-m/jobserver
+[fig1sc]: TODO
 
 ### Figure 2
 
