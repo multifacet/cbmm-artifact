@@ -231,18 +231,20 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
 
 1. Run the experiments. We recommend repeating this step five times, generating five sets of results, to reduce variance.
 
+   Replace `{MACHINE}` and `{USER}` for the `ip:port` and username on the _test_ machine, as in the setup steps.
+
    **Linux/CBMM**
 
    ```sh
    cd cbmm-runner/runner
-   ../../scripts/figure-5-linux-cbmm.sh
+   ../../scripts/figure-5-linux-cbmm.sh {MACHINE} {USER}
    ```
 
    **HawkEye**
 
    ```sh
    cd cbmm-runner/runner
-   ../../scripts/figure-5-hawkeye.sh
+   ../../scripts/figure-5-hawkeye.sh {MACHINE} {USER}
    ```
 
 2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression, which can shorten network transfers significantly.
@@ -457,7 +459,7 @@ These experiments measure page fault latency on Linux (v5.5.8) for each of the w
 
     ```sh
     cd cbmm-runner/runner
-    ../../scripts/figure-2.sh
+    ../../scripts/figure-2.sh {MACHINE} {USER}
     ```
 
 2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
@@ -493,15 +495,15 @@ These experiments are similar to Figure 2. They collect the same data as Figure 
 
     ```sh
     cd cbmm-runner/runner
-    ../../scripts/figure-2.sh           # Linux
-    ../../scripts/figure-4-cbmm.sh      # CBMM
+    ../../scripts/figure-2.sh  {MACHINE} {USER}         # Linux
+    ../../scripts/figure-4-cbmm.sh  {MACHINE} {USER}    # CBMM
     ```
 
     **HawkEye**
 
     ```sh
     cd cbmm-runner/runner
-    ../../scripts/figure-4-hawkeye.sh
+    ../../scripts/figure-4-hawkeye.sh {MACHINE} {USER}
     ```
 
 2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
@@ -613,14 +615,14 @@ These experiments capture the amount of each workloads' memory usage covered by 
 
    ```sh
    cd cbmm-runner/runner
-   ../../scripts/figure-6-linux-cbmm.sh
+   ../../scripts/figure-6-linux-cbmm.sh {MACHINE} {USER}
    ```
 
    **HawkEye**
 
    ```sh
    cd cbmm-runner/runner
-   ../../scripts/figure-6-hawkeye.sh
+   ../../scripts/figure-6-hawkeye.sh {MACHINE} {USER}
 
 2. Copy the results back from the _test_ machine to the _driver_ machine. We recommend `rsync` for this, as it supports compression.
 
@@ -715,3 +717,8 @@ As with Figure 5, the runtime of the workload is reported in the `$OUTPUT.runtim
 In this section, we explore the impact of different models in CBMM by rerunning the experiments of Figures 2, 4, and 5 with parts of our CBMM prototype turned off.
 
 The commands to run the experiments are in `./scripts/section-5.6.sh`. The results can be plotted using the same steps as Figures 2, 4, and 5, documented above.
+
+```sh
+cd cbmm-runner/runner
+./scripts/section-5.6.sh {MACHINE} {USER}
+```
