@@ -6,13 +6,13 @@ header-includes:
 
 # Artifact package for CBMM paper (ATC'22)
 
-CLICK HERE >>> [**THIS README IS BEST VIEWED ON GITHUB**](https://github.com/multifacet/cbmm-artifact/blob/main/README.md) <<<
-
-To generate a PDF version of this README:
-
-```sh
-pandoc -s -V geometry:margin=1in --toc -V colorlinks -V urlcolor=NavyBlue -V toccolor=Red -o README.pdf README.md
-```
+> [**THIS README IS BEST VIEWED ON GITHUB**](https://github.com/multifacet/cbmm-artifact/blob/main/README.md)
+>
+> To generate a PDF version of this README:
+>
+> ```sh
+> pandoc -s -V geometry:margin=1in --toc -V colorlinks -V urlcolor=NavyBlue -V toccolor=Red -o README.pdf README.md
+> ```
 
 ## Overview
 
