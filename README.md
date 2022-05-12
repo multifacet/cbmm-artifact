@@ -52,8 +52,9 @@ _Driver_ machine:
 - [Rust](https://www.rust-lang.org/tools/install) 1.31 or greater. The `runner` is written in rust.
 - Needs to have _passwordless_ SSH access to the _test_ machine. This is used for automatedly running commands for the experiments.
    - The network needs to be _stable_ for long periods of time, as the SSH connection is maintained while long-running commands run.
-- No significant memory, CPU, or disk requirements...
 - The artifact evaluator will need access to a SPEC2017 ISO image. We don't include it because it is against the License :'(
+- For plotting: `matplotlib` (python 3)
+- No significant memory, CPU, or disk requirements...
 - **The driver machine is _not_ modified by the runner or any experiments.**
 
 _Test_ machine:
@@ -209,6 +210,8 @@ In the paper, Linux 5.5.8 is the comparison baseline, HawkEye is an additional c
 
 In the remainder of this document we give detailed instructions for generating results for each of our major claims and their corresponding figures, organized by figure. Commands explicitly labeled with **Linux/CBMM** should be run with the **Linux/CBMM** configuration; those labeled with **HawkEye** should be run with the **HawkEye** configuration; those not labeled can be run in either configuration. In the interest of the reviewer's time, we would recommend running Linux/CBMM experiments for multiple figures before switching configurations to run HawkEye experiments. This will reduce time spent switching between kernels (see step 5 of Getting Started for instructions to switch kernels).
 
+**NOTE**: Almost all of the scripts below produce regular output (at least once every few minutes). If a script appears to be unproductive for a long period of time, check if the _test_ machine is still responsive. An application or the kernel may have crashed (this should be rare but it happens occasionally).
+
 **A helpful tool**
 
 In running the thousands of experiments for this paper, we found it useful to track all experiments in a spreadsheet.
@@ -275,6 +278,8 @@ Once again, all of these commands are meant to be run on the _driver_ machine, n
    ```sh
    ./scripts/plot-perf.py $DATA.csv
    ```
+
+   **NOTE**: This and other plotting scripts depend on the `matplotlib` (python 3) library.
 
 ### Figure 1
 
@@ -477,6 +482,8 @@ These experiments measure page fault latency on Linux (v5.5.8) for each of the w
       -- $RESULTS_PATH.{pftrace,rejected} 10000)
    ```
 
+   **NOTE**: This and other plotting scripts depend on the `matplotlib` (python 3) library.
+
 ### Figure 4
 
 <img src="figures/fig4-lgd.png" alt="Legend of Figure 4" />
@@ -603,6 +610,8 @@ These experiments are similar to Figure 2. They collect the same data as Figure 
    OUTFNAME=tails-mix PDF=1 FREQ=2600 SCALE="$LINUX_SCALE $CBMM_SCALE $HAWKEYE_SCALE" ./scripts/tail-cdf.py 10 $(cat /tmp/tails.txt)
    ```
 
+   **NOTE**: This and other plotting scripts depend on the `matplotlib` (python 3) library.
+
 ### Figure 6
 
 ![Figure 6 from the paper](figures/fig6.png)
@@ -649,6 +658,8 @@ These experiments capture the amount of each workloads' memory usage covered by 
    ```sh
    ./scripts/plot-hp-efficiency.py /path/to/downloaded.csv
    ```
+
+   **NOTE**: This and other plotting scripts depend on the `matplotlib` (python 3) library.
 
 ### Section 5.5
 
