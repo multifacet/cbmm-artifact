@@ -733,3 +733,9 @@ The commands to run the experiments are in `./scripts/section-5.6.sh`. The resul
 cd cbmm-runner/runner
 ./scripts/section-5.6.sh {MACHINE} {USER}
 ```
+
+# Licensing
+
+CBMM itself is derived from the Linux kernel, so it is subjected to [the same license(s) as Linux](https://github.com/multifacet/cbmm/tree/ffc5a23759fcbf862ed68eaad460eeb06d79431d/LICENSES).
+
+The other tooling of this artifact, `cbmm-runner`, `scripts/*`, etc. are subject to the [Apache License](./LICENSE).
